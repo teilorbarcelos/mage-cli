@@ -40,5 +40,4 @@ module.exports = function (name) {
   fs.writeFileSync(`./components/${name}/styles.module.css`, stylesModule, (err) => {
     if (err) { throw err }
   })
-  console.log(`Abra Kadabra!... Resource created!`)
 }

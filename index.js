@@ -2,7 +2,12 @@
 
 const program = require('commander')
 const package = require('./package.json')
-const Nbc = require('./src/next/component')
+
+const Section = require('./src/next/section')
+const Button = require('./src/next/button')
+const LoginPage = require('./src/next/loginPage')
+const Navbar = require('./src/next/navbar')
+const Footer = require('./src/next/footer')
 
 program.version(package.version)
 
@@ -12,13 +17,41 @@ program
   .action((framework, resource, name) => {
 
     if (framework == 'next') {
-      if (resource == 'component') {
-        if (name) {
-          Nbc(name)
-        }
-      }
-    }
 
+      switch (resource) {
+
+        case 'section':
+          if (name) {
+            Section(name)
+          }
+          break
+
+        case 'button':
+          if (name) {
+            Button(name)
+          }
+          break
+
+        case 'loginPage':
+          LoginPage()
+          break
+
+        case 'navbar':
+          if (name) {
+            Navbar(name)
+          }
+          break
+
+        case 'footer':
+          if (name) {
+            Footer(name)
+          }
+          break
+
+      }
+      console.log(`Abra Kadabra!... Resource created!`)
+      return
+    }
   });
 
 program.parse(process.argv)
