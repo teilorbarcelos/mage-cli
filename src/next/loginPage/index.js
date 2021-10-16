@@ -105,7 +105,6 @@ export default Login`
   gap: 0.3rem;\r
 }`
 
-
   fs.writeFileSync(`./pages/Login/index.tsx`, nextComponent, (err) => {
     if (err) { throw err }
   })
@@ -113,4 +112,14 @@ export default Login`
   fs.writeFileSync(`./pages/Login/styles.module.css`, stylesModule, (err) => {
     if (err) { throw err }
   })
+
+  // cria o Button1 caso ainda não exista
+
+  if (!fs.existsSync(`./components/Button1`)) {
+    const Command = require(`../button`)
+
+    Command('button1')
+  }
+
+  console.log(`Abra Kadabra!... Login Page created!`)
 }

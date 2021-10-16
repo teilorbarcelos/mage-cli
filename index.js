@@ -3,12 +3,6 @@
 const program = require('commander')
 const package = require('./package.json')
 
-const Section = require('./src/next/section')
-const Button = require('./src/next/button')
-const LoginPage = require('./src/next/loginPage')
-const Navbar = require('./src/next/navbar')
-const Footer = require('./src/next/footer')
-
 program.version(package.version)
 
 program
@@ -18,39 +12,9 @@ program
 
     if (framework == 'next') {
 
-      switch (resource) {
+      const Command = require(`./src/${framework}/${resource}`)
 
-        case 'section':
-          if (name) {
-            Section(name)
-          }
-          break
-
-        case 'button':
-          if (name) {
-            Button(name)
-          }
-          break
-
-        case 'loginPage':
-          LoginPage()
-          break
-
-        case 'navbar':
-          if (name) {
-            Navbar(name)
-          }
-          break
-
-        case 'footer':
-          if (name) {
-            Footer(name)
-          }
-          break
-
-      }
-      console.log(`Abra Kadabra!... Resource created!`)
-      return
+      Command(name && name)
     }
   });
 

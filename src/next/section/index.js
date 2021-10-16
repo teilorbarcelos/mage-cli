@@ -1,6 +1,12 @@
 const fs = require('fs')
 
 module.exports = function (name) {
+
+  if (!name) {
+    console.log('You need to say the name!')
+    return
+  }
+
   name = name[0].toUpperCase() + name.slice(1)
   const dir = `./components/${name}`
 
@@ -16,21 +22,21 @@ module.exports = function (name) {
   fs.mkdirSync(dir)
 
   const nextComponent =
-    `import styles from './styles.module.css'\r` +
-    `import globals from '../../styles/globals.module.css'\r` +
-    `\r` +
-    `export default function ${name}(){\r` +
-    `  return (\r` +
-    `    <section className={styles.${name.toLowerCase()}} id="${name.toLowerCase()}">\r` +
-    `    \r` +
-    `    </section>\r` +
-    `  )\r` +
-    `}`
+    `import styles from './styles.module.css'\r
+import globals from '../../styles/globals.module.css'\r
+\r
+export default function ${name}(){\r
+  return (\r
+    <section className={styles.${name.toLowerCase()}} id="${name.toLowerCase()}">\r
+    \r
+    </section>\r
+  )\r
+}`
 
   const stylesModule =
-    `.${name.toLowerCase()} {\r` +
-    `  \r` +
-    `}`
+    `.${name.toLowerCase()} {\r
+  \r
+}`
 
 
   fs.writeFileSync(`./components/${name}/index.tsx`, nextComponent, (err) => {
@@ -40,4 +46,6 @@ module.exports = function (name) {
   fs.writeFileSync(`./components/${name}/styles.module.css`, stylesModule, (err) => {
     if (err) { throw err }
   })
+
+  console.log(`Abra Kadabra!... Resource created!`)
 }
