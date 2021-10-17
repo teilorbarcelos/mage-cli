@@ -6,7 +6,10 @@
   "bin": {
     "mage": "index.js"
   },
-  "repository": "git@github.com:teilorbarcelos/mage-cli.git",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/teilorbarcelos/mage-cli.git"
+  },
   "author": "Teilor Souza Barcelos <tsb-@live.com>",
   "license": "MIT",
   "dependencies": {
@@ -16,5 +19,19 @@
     "figlet": "^1.5.2",
     "inquirer": "^8.2.0",
     "shelljs": "^0.8.4"
-  }
+  },
+  "bugs": {
+    "url": "https://github.com/teilorbarcelos/mage-cli/issues"
+  },
+  "homepage": "https://github.com/teilorbarcelos/mage-cli#readme",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "cli",
+    "mage",
+    "automate",
+    "development"
+  ]
 }
