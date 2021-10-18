@@ -1,8 +1,7 @@
 const { exec } = require('child_process')
-const path = require("path")
 const fs = require('fs')
 
-async function installMongodb() {
+async function installDependencies() {
   exec(`yarn add mongodb && yarn add @types/mongodb -D`, (error, stdout, stderr) => {
     if (error) {
       console.log(`error: ${error.message}`)
@@ -12,7 +11,7 @@ async function installMongodb() {
       console.log(`stderr: ${stderr}`)
     }
   })
-  console.log(`Hocus Pocus!... Connection with mongodb created!`)
+  console.log(`Hocus Pocus!... Dependencies added!`)
 }
 
 module.exports = function () {
@@ -110,13 +109,11 @@ export async function updateItem({ table, item }: InsertDataProps) {\r
   \r
   try {\r
     await client.connect()\r
-    \r
+\r
     const col = db.collection(table)\r
-    \r
-    await col.updateOne({ login: item.login }, item)\r
-    \r
+\r
     if (item.login) {\r
-      response = await col.findOne({ login: item.login })\r
+      response = await col.updateOne({ login: item.login }, { $set: item }) as UpdateResult\r
     }\r
     \r
   } catch (err) {\r
@@ -161,7 +158,7 @@ export async function deleteItem({ table, item }: SelectDataProps) {\r
   const package = fs.readFileSync("./package.json", "utf8")
 
   if (package.indexOf('mongodb') == -1) {
-    installMongodb()
+    installDependencies()
   }
 
   console.log(`Abra Kadabra!... Connection with mongodb created!`)
