@@ -1,7 +1,21 @@
+const { exec } = require('child_process')
+const path = require("path")
 const fs = require('fs')
 
-module.exports = function () {
+async function installMongodb() {
+  exec(`yarn add mongodb && yarn add @types/mongodb -D`, (error, stdout, stderr) => {
+    if (error) {
+      console.log(`error: ${error.message}`)
+      return
+    }
+    if (stderr) {
+      console.log(`stderr: ${stderr}`)
+    }
+  })
+  console.log(`Hocus Pocus!... Connection with mongodb created!`)
+}
 
+module.exports = function () {
   const dir = `./utils/dbController.ts`
 
   if (fs.existsSync(dir)) {
@@ -70,11 +84,13 @@ export async function selectItem({ table, item }: SelectDataProps) {\r
   \r
   try {\r
     await client.connect()\r
-    \r
-    const col = db.collection(table)\r
-    \r
+\r
     if (table == 'users') {\r
-      response = await col.findOne({ login: item.login })\r
+      if (!item) {\r
+        response = await db.collection(table).find().toArray()\r
+      } else {\r
+        response = await db.collection(table).findOne({ login: item.login })\r
+      }\r
     }\r
     \r
   } catch (err) {\r
@@ -141,6 +157,12 @@ export async function deleteItem({ table, item }: SelectDataProps) {\r
   fs.writeFileSync(`./utils/dbController.ts`, nextComponent, (err) => {
     if (err) { throw err }
   })
+
+  const package = fs.readFileSync("./package.json", "utf8")
+
+  if (package.indexOf('mongodb') == -1) {
+    installMongodb()
+  }
 
   console.log(`Abra Kadabra!... Connection with mongodb created!`)
 }
