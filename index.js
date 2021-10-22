@@ -10,12 +10,10 @@ program
   .description('Create a framework resource with a specific name')
   .action((framework, resource, name) => {
 
-    if (framework == 'next') {
+  const Command = require(`./src/${framework}/${resource}`)
 
-      const Command = require(`./src/${framework}/${resource}`)
-
-      Command(name && name)
-    }
-  });
+  Command(name && name)
+  
+});
 
 program.parse(process.argv)
