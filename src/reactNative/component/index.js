@@ -15,6 +15,10 @@ module.exports = function (name) {
     return
   }
 
+  if (!fs.existsSync('./src')) {
+    fs.mkdirSync('./src')
+  }
+
   if (!fs.existsSync('./src/components')) {
     fs.mkdirSync('./src/components')
   }
