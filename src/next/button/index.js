@@ -8,29 +8,34 @@ module.exports = function (name) {
   }
 
   name = name[0].toUpperCase() + name.slice(1)
-  const dir = `./components/${name}`
+  const dir = `./src/components/${name}`
 
   if (fs.existsSync(dir)) {
     console.log('The resource you are trying to create already exists!')
     return
   }
 
-  if (!fs.existsSync('./components')) {
-    fs.mkdirSync('./components')
+  if (!fs.existsSync('./src')) {
+    fs.mkdirSync('./src')
+  }
+
+  if (!fs.existsSync('./src/components')) {
+    fs.mkdirSync('./src/components')
   }
 
   fs.mkdirSync(dir)
 
   const nextComponent =
-    `import styles from './styles.module.css'\r
+    `import { ButtonHTMLAttributes } from 'react'\r
+import styles from './styles.module.css'\r
 \r
-interface Props {\r
+interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {\r
   title: string\r
 }\r
 \r
-export default function ${name}({ title }: Props){\r
+export default function ${name}({ title, ...rest }: Props){\r
   return (\r
-    <button className={styles.${name.toLowerCase()}}>{title}</button>\r
+    <button {...rest} className={styles.${name.toLowerCase()}}>{title}</button>\r
   )\r
 }`
 
@@ -49,11 +54,11 @@ export default function ${name}({ title }: Props){\r
 }`
 
 
-  fs.writeFileSync(`./components/${name}/index.tsx`, nextComponent, (err) => {
+  fs.writeFileSync(`./src/components/${name}/index.tsx`, nextComponent, (err) => {
     if (err) { throw err }
   })
 
-  fs.writeFileSync(`./components/${name}/styles.module.css`, stylesModule, (err) => {
+  fs.writeFileSync(`./src/components/${name}/styles.module.css`, stylesModule, (err) => {
     if (err) { throw err }
   })
 

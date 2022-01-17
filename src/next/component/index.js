@@ -31,9 +31,9 @@ import globals from '../../styles/globals.module.css'\r
 \r
 export default function ${name}(){\r
   return (\r
-    <section className={styles.${name.toLowerCase()}} id="${name.toLowerCase()}">\r
+    <div className={styles.${name.toLowerCase()}} id="${name.toLowerCase()}">\r
     \r
-    </section>\r
+    </div>\r
   )\r
 }`
 

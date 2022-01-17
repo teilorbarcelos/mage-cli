@@ -1,15 +1,19 @@
 const fs = require('fs')
 
 module.exports = function () {
-  const dir = `./components/Navbar`
+  const dir = `./src/components/Navbar`
 
   if (fs.existsSync(dir)) {
     console.log('The resource you are trying to create already exists!')
     return
   }
 
-  if (!fs.existsSync('./components')) {
-    fs.mkdirSync('./components')
+  if (!fs.existsSync('./src')) {
+    fs.mkdirSync('./src')
+  }
+
+  if (!fs.existsSync('./src/components')) {
+    fs.mkdirSync('./src/components')
   }
 
   fs.mkdirSync(dir)
@@ -72,11 +76,11 @@ export default function Navbar() {\r
 }`
 
 
-  fs.writeFileSync(`./components/Navbar/index.tsx`, nextComponent, (err) => {
+  fs.writeFileSync(`./src/components/Navbar/index.tsx`, nextComponent, (err) => {
     if (err) { throw err }
   })
 
-  fs.writeFileSync(`./components/Navbar/styles.module.css`, stylesModule, (err) => {
+  fs.writeFileSync(`./src/components/Navbar/styles.module.css`, stylesModule, (err) => {
     if (err) { throw err }
   })
 

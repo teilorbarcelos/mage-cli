@@ -1,15 +1,19 @@
 const fs = require('fs')
 
 module.exports = function () {
-  const dir = `./components/Footer`
+  const dir = `./src/components/Footer`
 
   if (fs.existsSync(dir)) {
     console.log('The resource you are trying to create already exists!')
     return
   }
 
-  if (!fs.existsSync('./components')) {
-    fs.mkdirSync('./components')
+  if (!fs.existsSync('./src')) {
+    fs.mkdirSync('./src')
+  }
+
+  if (!fs.existsSync('./src/components')) {
+    fs.mkdirSync('./src/components')
   }
 
   fs.mkdirSync(dir)
@@ -37,11 +41,11 @@ export default function Footer() {\r
 }`
 
 
-  fs.writeFileSync(`./components/Footer/index.tsx`, nextComponent, (err) => {
+  fs.writeFileSync(`./src/components/Footer/index.tsx`, nextComponent, (err) => {
     if (err) { throw err }
   })
 
-  fs.writeFileSync(`./components/Footer/styles.module.css`, stylesModule, (err) => {
+  fs.writeFileSync(`./src/components/Footer/styles.module.css`, stylesModule, (err) => {
     if (err) { throw err }
   })
 

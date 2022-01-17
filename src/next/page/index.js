@@ -7,8 +7,7 @@ module.exports = function (name) {
     return
   }
 
-  name = name[0].toUpperCase() + name.slice(1)
-  const dir = `./src/components/${name}`
+  const dir = `./src/pages/${name}`
 
   if (fs.existsSync(dir)) {
     console.log('The resource you are trying to create already exists!')
@@ -19,8 +18,8 @@ module.exports = function (name) {
     fs.mkdirSync('./src')
   }
 
-  if (!fs.existsSync('./src/components')) {
-    fs.mkdirSync('./src/components')
+  if (!fs.existsSync('./src/pages')) {
+    fs.mkdirSync('./src/pages')
   }
 
   fs.mkdirSync(dir)
@@ -29,27 +28,27 @@ module.exports = function (name) {
     `import styles from './styles.module.css'\r
 import globals from '../../styles/globals.module.css'\r
 \r
-export default function ${name}(){\r
+export default function ${name[0].toUpperCase() + name.slice(1)}(){\r
   return (\r
-    <section className={styles.${name.toLowerCase()}} id="${name.toLowerCase()}">\r
+    <div className={styles.${name}} id="${name}">\r
     \r
-    </section>\r
+    </div>\r
   )\r
 }`
 
   const stylesModule =
-    `.${name.toLowerCase()} {\r
+    `.${name} {\r
   \r
 }`
 
 
-  fs.writeFileSync(`./src/components/${name}/index.tsx`, nextComponent, (err) => {
+  fs.writeFileSync(`./src/pages/${name}/index.tsx`, nextComponent, (err) => {
     if (err) { throw err }
   })
 
-  fs.writeFileSync(`./src/components/${name}/styles.module.css`, stylesModule, (err) => {
+  fs.writeFileSync(`./src/pages/${name}/styles.module.css`, stylesModule, (err) => {
     if (err) { throw err }
   })
 
-  console.log(`Abra Kadabra!... Resource created!`)
+  console.log(`Abra Kadabra!... Page: ${name} created!`)
 }
