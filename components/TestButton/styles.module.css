@@ -1,0 +1,12 @@
+.testbutton {
+  border: 2px solid red;
+  background: red;
+  border-radius: 0.3rem;
+  color: blue;
+  transition: 0.3s;
+  cursor: pointer;
+}
+
+.testbutton:hover {
+  opacity: 0.8;
+}

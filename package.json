@@ -24,14 +24,25 @@
     "url": "https://github.com/teilorbarcelos/mage-cli/issues"
   },
   "homepage": "https://github.com/teilorbarcelos/mage-cli#readme",
-  "devDependencies": {},
+  "devDependencies": {
+    "@types/node": "^20.11.25",
+    "typescript": "^5.4.2"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc && yarn copy-package && yarn --cwd dist --production && sudo npm install -g dist",
+    "copy-package": "cp package.json dist",
+    "start": "node dist/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "publish": "npm publish",
+    "dev": "ts-node src/index.ts"
   },
   "keywords": [
     "cli",
     "mage",
     "automate",
     "development"
+  ],
+  "files": [
+    "dist"
   ]
 }

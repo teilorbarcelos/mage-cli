@@ -1,0 +1,15 @@
+{
+    "stack": "{stack}",
+    "path-mapping": {
+        "src": "{src}",
+        "components": "{components}",
+        "hooks": "{hooks}",
+        "pages": "{pages}",
+        "modules": "{modules}",
+        "assets": "{assets}",
+        "base": "{base}",
+        "lib": "{lib}",
+        "controllers": "{controllers}",
+        "services": "{services}"
+    }
+}
