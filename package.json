@@ -17,7 +17,8 @@
     "cli-table": "^0.3.6",
     "commander": "^8.2.0",
     "figlet": "^1.5.2",
-    "inquirer": "^8.2.0",
+    "handlebars": "^4.7.8",
+    "inquirer": "^8.0.0",
     "shelljs": "^0.8.4"
   },
   "bugs": {
@@ -25,12 +26,13 @@
   },
   "homepage": "https://github.com/teilorbarcelos/mage-cli#readme",
   "devDependencies": {
+    "@types/inquirer": "^9.0.7",
     "@types/node": "^20.11.25",
     "typescript": "^5.4.2"
   },
   "scripts": {
-    "build": "tsc && yarn copy-package && yarn --cwd dist --production && sudo npm install -g dist",
-    "copy-package": "cp package.json dist",
+    "build": "rm -rf dist && tsc && yarn copy-package && yarn --cwd dist --production && sudo npm install -g dist && chmod +x /usr/local/bin/mage",
+    "copy-package": "cp package.json dist && cp -r src/models dist/models",
     "start": "node dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "publish": "npm publish",

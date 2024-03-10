@@ -1,16 +1,16 @@
 {
-    "stack": "{stack}",
-    "path-mapping": {
-        "assets": "{assets}",
-        "base": "{base}",
-        "components": "{components}",
-        "controllers": "{controllers}",
-        "helpers": "{helpers}",
-        "hooks": "{hooks}",
-        "lib": "{lib}",
-        "modules": "{modules}",
-        "pages": "{pages}",
-        "services": "{services}",
-        "src": "{src}"
-    }
+    "stack": "{{stack}}",
+    "assets": "{{assets}}",
+    "base": "{{base}}",
+    "components": "{{components}}",
+    "controllers": "{{controllers}}",
+    "fn": "{{fn}}",
+    "helpers": "{{helpers}}",
+    "hooks": "{{hooks}}",
+    "lib": "{{lib}}",
+    "models": "{{models}}",
+    "modules": "{{modules}}",
+    "pages": "{{pages}}",
+    "services": "{{services}}",
+    "src": "{{src}}"
 }
