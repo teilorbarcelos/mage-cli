@@ -1,15 +1,16 @@
 {
     "stack": "{stack}",
     "path-mapping": {
-        "src": "{src}",
-        "components": "{components}",
-        "hooks": "{hooks}",
-        "pages": "{pages}",
-        "modules": "{modules}",
         "assets": "{assets}",
         "base": "{base}",
-        "lib": "{lib}",
+        "components": "{components}",
         "controllers": "{controllers}",
-        "services": "{services}"
+        "helpers": "{helpers}",
+        "hooks": "{hooks}",
+        "lib": "{lib}",
+        "modules": "{modules}",
+        "pages": "{pages}",
+        "services": "{services}",
+        "src": "{src}"
     }
 }
