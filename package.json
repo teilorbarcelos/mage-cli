@@ -1,6 +1,6 @@
 {
   "name": "mage-cli",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "AI-powered CLI for web development with pluggable pattern repositories.",
   "main": "dist/index.js",
   "bin": {
