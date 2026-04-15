@@ -92,10 +92,8 @@ Browse, manage, and initialize patterns repositories.
 
 ```bash
 # Create a new patterns repo connected to a remote
+# (you'll be asked where to create it, defaults to ~/your-patterns)
 mage patterns init git@github.com:your-user/your-patterns.git
-
-# Create in a custom directory name
-mage patterns init git@github.com:your-user/your-patterns.git --dir my-patterns
 
 # List all available patterns
 mage patterns list
@@ -107,11 +105,11 @@ mage patterns list --framework react
 mage patterns sync
 ```
 
-The `init` command creates a ready-to-use patterns repository with:
-- `manifest.json` — pattern index
-- A starter React component pattern as example
-- Git initialized with the remote already configured
-- Just `git push -u origin main` to publish
+The `init` command:
+1. Asks where to create the repository (defaults to `~/repo-name`)
+2. Scaffolds the full patterns structure with a starter example
+3. Initializes git with the remote already configured
+4. You just need to `git push -u origin main` to publish
 
 ## Configuration
 

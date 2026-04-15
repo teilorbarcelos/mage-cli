@@ -1,0 +1,14 @@
+{
+  "repository": {
+    "owner": "teilorbarcelos",
+    "name": "mage-patterns",
+    "branch": "main"
+  },
+  "paths": {
+    "components": "src/components",
+    "pages": "src/pages",
+    "hooks": "src/hooks",
+    "services": "src/services",
+    "lib": "src/lib"
+  }
+}

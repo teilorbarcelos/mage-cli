@@ -1,6 +1,8 @@
 import { Command } from "commander";
 import path from "path";
+import os from "os";
 import { execSync } from "child_process";
+import * as inquirer from "inquirer";
 import { writeFileSafe, fileExists } from "../utils/fs";
 import * as logger from "../utils/logger";
 
@@ -110,58 +112,66 @@ export function registerInitRepoCommand(parent: Command): void {
     .description(
       "Create a local patterns repository connected to a remote git URL"
     )
-    .option(
-      "-d, --dir <directory>",
-      "Directory name to create (defaults to repo name from URL)"
-    )
-    .action((gitUrl: string, options: { dir?: string }) => {
-      const repoName = options.dir || extractRepoName(gitUrl);
-      const repoPath = path.resolve(process.cwd(), repoName);
+    .action(async (gitUrl: string) => {
+      const repoName = extractRepoName(gitUrl);
+      const defaultPath = path.join(os.homedir(), repoName);
 
-      if (fileExists(repoPath)) {
-        logger.error(`Directory "${repoName}" already exists`);
+      const prompt = inquirer.createPromptModule();
+      const { repoPath } = await prompt<{ repoPath: string }>([
+        {
+          type: "input",
+          name: "repoPath",
+          message: "Where should the patterns repository be created?",
+          default: defaultPath,
+        },
+      ]);
+
+      const resolvedPath = path.resolve(repoPath);
+
+      if (fileExists(resolvedPath)) {
+        logger.error(`Directory already exists: ${resolvedPath}`);
         process.exit(1);
       }
 
       logger.header("Creating patterns repository");
 
       writeFileSafe(
-        path.join(repoPath, "manifest.json"),
+        path.join(resolvedPath, "manifest.json"),
         STARTER_MANIFEST
       );
       logger.success("manifest.json");
 
       writeFileSafe(
-        path.join(repoPath, "react/component/pattern.json"),
+        path.join(resolvedPath, "react/component/pattern.json"),
         STARTER_PATTERN_JSON
       );
       logger.success("react/component/pattern.json");
 
       writeFileSafe(
         path.join(
-          repoPath,
+          resolvedPath,
           "react/component/template/{{pascalCase name}}/index.tsx.hbs"
         ),
         STARTER_COMPONENT_TEMPLATE
       );
       writeFileSafe(
         path.join(
-          repoPath,
+          resolvedPath,
           "react/component/template/{{pascalCase name}}/styles.module.css.hbs"
         ),
         STARTER_STYLES_TEMPLATE
       );
       logger.success("react/component/template/ (starter pattern)");
 
-      writeFileSafe(path.join(repoPath, ".gitignore"), STARTER_GITIGNORE);
-      writeFileSafe(path.join(repoPath, "README.md"), STARTER_README);
+      writeFileSafe(path.join(resolvedPath, ".gitignore"), STARTER_GITIGNORE);
+      writeFileSafe(path.join(resolvedPath, "README.md"), STARTER_README);
       logger.success(".gitignore + README.md");
 
       try {
-        run("git init", repoPath);
-        run(`git remote add origin ${gitUrl}`, repoPath);
-        run("git add .", repoPath);
-        run('git commit -m "Initial patterns repository"', repoPath);
+        run("git init", resolvedPath);
+        run(`git remote add origin ${gitUrl}`, resolvedPath);
+        run("git add .", resolvedPath);
+        run('git commit -m "Initial patterns repository"', resolvedPath);
         logger.success(`Git initialized with remote: ${gitUrl}`);
       } catch (err) {
         logger.error(
@@ -171,13 +181,10 @@ export function registerInitRepoCommand(parent: Command): void {
       }
 
       console.log();
-      logger.info(`Repository ready at ./${repoName}`);
+      logger.info(`Repository ready at ${resolvedPath}`);
       logger.dim("Next steps:");
-      logger.dim("  1. cd " + repoName);
+      logger.dim("  1. cd " + resolvedPath);
       logger.dim("  2. Add more patterns to manifest.json");
       logger.dim("  3. git push -u origin main");
-      logger.dim(
-        `  4. mage config set repo <owner>/${repoName}`
-      );
     });
 }
