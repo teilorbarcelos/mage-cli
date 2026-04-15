@@ -24,9 +24,7 @@
     "bump:minor": "npm version minor",
     "bump:major": "npm version major",
     "prepublishOnly": "npm run typecheck && npm run build",
-    "release": "npm run bump:patch && npm publish",
-    "play": "cd playground && tsx ../src/index.ts",
-    "clean:playground": "find playground/src -mindepth 1 ! -name '.gitkeep' -delete 2>/dev/null; echo 'Playground cleaned'"
+    "release": "npm run bump:patch && npm publish"
   },
   "dependencies": {
     "@octokit/rest": "^22.0.1",
