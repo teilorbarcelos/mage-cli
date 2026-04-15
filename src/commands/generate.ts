@@ -23,15 +23,13 @@ export function registerGenerateCommand(program: Command): void {
     .alias("g")
     .description("Generate code from a pattern or with AI assistance")
     .option("-d, --description <desc>", "Describe what you want to generate")
-    .option(
-      "-f, --framework <framework>",
-      "Filter patterns by framework"
-    )
+    .option("-f, --framework <framework>", "Filter patterns by framework")
+    .option("-s, --scope <scope>", "Filter by scope (frontend or backend)")
     .action(
       async (
         pattern: string | undefined,
         name: string | undefined,
-        options: { description?: string; framework?: string }
+        options: { description?: string; framework?: string; scope?: string }
       ) => {
         const config = await loadConfig();
 
@@ -44,6 +42,12 @@ export function registerGenerateCommand(program: Command): void {
 
         const manifest = await fetchManifest(config.repository);
         let availablePatterns = manifest.patterns;
+
+        if (options.scope) {
+          availablePatterns = availablePatterns.filter(
+            (p) => p.scope.toLowerCase() === options.scope!.toLowerCase()
+          );
+        }
 
         if (options.framework) {
           availablePatterns = availablePatterns.filter(
@@ -144,7 +148,7 @@ async function generateFromPattern(
     selectedPattern = found;
   } else {
     const choices = patterns.map((p) => ({
-      name: `${p.framework}/${p.category}/${p.name} — ${p.description}`,
+      name: `[${p.scope}] ${p.framework}/${p.category}/${p.name} — ${p.description}`,
       value: p,
     }));
 

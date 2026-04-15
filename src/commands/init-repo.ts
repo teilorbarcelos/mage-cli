@@ -14,9 +14,10 @@ const STARTER_MANIFEST = JSON.stringify(
         name: "component",
         description:
           "React functional component with CSS Modules and TypeScript",
+        scope: "frontend",
         framework: "react",
         category: "component",
-        path: "react/component",
+        path: "frontend/react/component",
         files: [
           "{{pascalCase name}}/index.tsx.hbs",
           "{{pascalCase name}}/styles.module.css.hbs",
@@ -33,6 +34,7 @@ const STARTER_PATTERN_JSON = JSON.stringify(
     name: "component",
     description:
       "React functional component with CSS Modules and TypeScript",
+    scope: "frontend",
     framework: "react",
     category: "component",
     variables: [
@@ -142,7 +144,7 @@ export function registerInitRepoCommand(parent: Command): void {
       logger.success("manifest.json");
 
       writeFileSafe(
-        path.join(resolvedPath, "react/component/pattern.json"),
+        path.join(resolvedPath, "frontend/react/component/pattern.json"),
         STARTER_PATTERN_JSON
       );
       logger.success("react/component/pattern.json");
@@ -150,14 +152,14 @@ export function registerInitRepoCommand(parent: Command): void {
       writeFileSafe(
         path.join(
           resolvedPath,
-          "react/component/template/{{pascalCase name}}/index.tsx.hbs"
+          "frontend/react/component/template/{{pascalCase name}}/index.tsx.hbs"
         ),
         STARTER_COMPONENT_TEMPLATE
       );
       writeFileSafe(
         path.join(
           resolvedPath,
-          "react/component/template/{{pascalCase name}}/styles.module.css.hbs"
+          "frontend/react/component/template/{{pascalCase name}}/styles.module.css.hbs"
         ),
         STARTER_STYLES_TEMPLATE
       );

@@ -159,18 +159,25 @@ Mage reads patterns from any GitHub repository that follows this structure:
 ```
 your-patterns-repo/
 ├── manifest.json
-├── react/
-│   ├── component/
-│   │   ├── pattern.json
-│   │   └── template/
-│   │       ├── {{pascalCase name}}/
-│   │       │   ├── index.tsx.hbs
-│   │       │   └── styles.module.css.hbs
-│   ├── hook/
-│   └── service/
-└── next/
-    ├── component/
-    └── page/
+├── frontend/
+│   ├── react/
+│   │   ├── component/
+│   │   │   ├── pattern.json
+│   │   │   └── template/
+│   │   │       ├── {{pascalCase name}}/
+│   │   │       │   ├── index.tsx.hbs
+│   │   │       │   └── styles.module.css.hbs
+│   │   ├── hook/
+│   │   └── service/
+│   └── next/
+│       ├── component/
+│       └── page/
+└── backend/
+    └── nodejs/
+        └── controller/
+            ├── pattern.json
+            └── template/
+                └── {{camelCase name}}Controller.ts.hbs
 ```
 
 ### manifest.json
@@ -184,9 +191,10 @@ An index of every available pattern:
     {
       "name": "component",
       "description": "React functional component with CSS Modules and TypeScript",
+      "scope": "frontend",
       "framework": "react",
       "category": "component",
-      "path": "react/component",
+      "path": "frontend/react/component",
       "files": ["{{pascalCase name}}/index.tsx.hbs", "{{pascalCase name}}/styles.module.css.hbs"]
     }
   ]
@@ -201,6 +209,7 @@ Metadata and variables for each pattern. This is what the AI reads to make decis
 {
   "name": "component",
   "description": "React functional component with CSS Modules and TypeScript",
+  "scope": "frontend",
   "framework": "react",
   "category": "component",
   "variables": [

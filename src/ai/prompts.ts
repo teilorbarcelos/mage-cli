@@ -8,7 +8,7 @@ export function buildPatternSelectionPrompt(
   const patternList = availablePatterns
     .map(
       (p, i) =>
-        `  ${i + 1}. "${p.name}" (${p.framework}/${p.category}): ${p.description}`
+        `  ${i + 1}. [${p.scope}] "${p.name}" (${p.framework}/${p.category}): ${p.description}`
     )
     .join("\n");
 

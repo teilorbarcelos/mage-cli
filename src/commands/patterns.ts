@@ -14,7 +14,8 @@ export function registerPatternsCommand(program: Command): void {
     .command("list")
     .description("List all available patterns")
     .option("-f, --framework <framework>", "Filter by framework")
-    .action(async (options: { framework?: string }) => {
+    .option("-s, --scope <scope>", "Filter by scope (frontend or backend)")
+    .action(async (options: { framework?: string; scope?: string }) => {
       const config = await loadConfig();
 
       if (!config.repository) {
@@ -26,6 +27,12 @@ export function registerPatternsCommand(program: Command): void {
 
       const manifest = await fetchManifest(config.repository);
       let filtered = manifest.patterns;
+
+      if (options.scope) {
+        filtered = filtered.filter(
+          (p) => p.scope.toLowerCase() === options.scope!.toLowerCase()
+        );
+      }
 
       if (options.framework) {
         filtered = filtered.filter(
@@ -40,18 +47,22 @@ export function registerPatternsCommand(program: Command): void {
 
       logger.header(`Available Patterns (${filtered.length})`);
 
-      const grouped = new Map<string, typeof filtered>();
+      const byScope = new Map<string, Map<string, typeof filtered>>();
       for (const pattern of filtered) {
-        const key = pattern.framework;
-        if (!grouped.has(key)) grouped.set(key, []);
-        grouped.get(key)!.push(pattern);
+        if (!byScope.has(pattern.scope)) byScope.set(pattern.scope, new Map());
+        const scopeMap = byScope.get(pattern.scope)!;
+        if (!scopeMap.has(pattern.framework)) scopeMap.set(pattern.framework, []);
+        scopeMap.get(pattern.framework)!.push(pattern);
       }
 
-      for (const [framework, pats] of grouped) {
+      for (const [scope, frameworks] of byScope) {
         console.log();
-        logger.info(`${framework}`);
-        for (const p of pats) {
-          logger.keyValue(`  ${p.category}/${p.name}`, p.description);
+        logger.info(scope.toUpperCase());
+        for (const [framework, pats] of frameworks) {
+          logger.dim(`  ${framework}`);
+          for (const p of pats) {
+            logger.keyValue(`    ${p.category}/${p.name}`, p.description);
+          }
         }
       }
     });

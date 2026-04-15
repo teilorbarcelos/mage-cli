@@ -29,6 +29,7 @@ export interface MageConfig {
 export interface PatternManifestEntry {
   name: string;
   description: string;
+  scope: "frontend" | "backend";
   framework: string;
   category: string;
   path: string;
@@ -43,6 +44,7 @@ export interface PatternManifest {
 export interface PatternMeta {
   name: string;
   description: string;
+  scope: "frontend" | "backend";
   framework: string;
   category: string;
   variables: PatternVariable[];
