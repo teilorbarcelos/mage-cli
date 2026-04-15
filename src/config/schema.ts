@@ -1,0 +1,61 @@
+export interface MageRepository {
+  owner: string;
+  name: string;
+  branch: string;
+  token?: string;
+}
+
+export interface MageAI {
+  provider: "openai";
+  apiKey: string;
+  model: string;
+}
+
+export interface MagePaths {
+  components: string;
+  pages: string;
+  hooks: string;
+  services: string;
+  lib: string;
+  [key: string]: string;
+}
+
+export interface MageConfig {
+  repository?: MageRepository;
+  ai?: MageAI;
+  paths?: MagePaths;
+}
+
+export interface PatternManifestEntry {
+  name: string;
+  description: string;
+  framework: string;
+  category: string;
+  path: string;
+  files: string[];
+}
+
+export interface PatternManifest {
+  version: string;
+  patterns: PatternManifestEntry[];
+}
+
+export interface PatternMeta {
+  name: string;
+  description: string;
+  framework: string;
+  category: string;
+  variables: PatternVariable[];
+}
+
+export interface PatternVariable {
+  name: string;
+  description: string;
+  default?: string;
+  required: boolean;
+}
+
+export interface GeneratedFile {
+  relativePath: string;
+  content: string;
+}
