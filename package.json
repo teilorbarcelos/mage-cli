@@ -1,10 +1,10 @@
 {
   "name": "mage-cli",
-  "version": "1.0.5",
-  "description": "CLI to help in web development.",
-  "main": "index.js",
+  "version": "2.0.0",
+  "description": "AI-powered CLI for web development with pluggable pattern repositories.",
+  "main": "dist/index.js",
   "bin": {
-    "mage": "index.js"
+    "mage": "dist/index.js"
   },
   "repository": {
     "type": "git",
@@ -12,26 +12,51 @@
   },
   "author": "Teilor Souza Barcelos <tsb-@live.com>",
   "license": "MIT",
-  "dependencies": {
-    "chalk": "^4.1.2",
-    "cli-table": "^0.3.6",
-    "commander": "^8.2.0",
-    "figlet": "^1.5.2",
-    "inquirer": "^8.2.0",
-    "shelljs": "^0.8.4"
-  },
-  "bugs": {
-    "url": "https://github.com/teilorbarcelos/mage-cli/issues"
-  },
-  "homepage": "https://github.com/teilorbarcelos/mage-cli#readme",
-  "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "tsx src/index.ts",
+    "build": "tsup",
+    "start": "node dist/index.js",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "link:local": "npm run build && npm link",
+    "typecheck": "tsc --noEmit",
+    "bump:patch": "npm version patch",
+    "bump:minor": "npm version minor",
+    "bump:major": "npm version major",
+    "prepublishOnly": "npm run typecheck && npm run build",
+    "release": "npm run bump:patch && npm publish"
+  },
+  "dependencies": {
+    "@octokit/rest": "^22.0.1",
+    "chalk": "^4.1.2",
+    "commander": "^12.1.0",
+    "cosmiconfig": "^9.0.0",
+    "handlebars": "^4.7.8",
+    "inquirer": "^8.0.0",
+    "openai": "^4.85.0",
+    "ora": "^5.4.1"
+  },
+  "devDependencies": {
+    "@types/inquirer": "^9.0.7",
+    "@types/node": "^20.11.25",
+    "tsup": "^8.4.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.4.2",
+    "vitest": "^3.1.1"
   },
   "keywords": [
     "cli",
     "mage",
-    "automate",
-    "development"
+    "ai",
+    "patterns",
+    "code-generator",
+    "web-development"
+  ],
+  "bugs": {
+    "url": "https://github.com/teilorbarcelos/mage-cli/issues"
+  },
+  "homepage": "https://github.com/teilorbarcelos/mage-cli#readme",
+  "files": [
+    "dist"
   ]
 }
