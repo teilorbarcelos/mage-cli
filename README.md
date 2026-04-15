@@ -124,6 +124,19 @@ CLI flags  →  Local .magerc.json  →  Global ~/.mage/config.json
 
 Stored at `~/.mage/config.json`. Set via `mage config set <key> <value>`.
 
+**Setting up your patterns repository:**
+When you set your repository, Mage will guide you through the local setup:
+
+```bash
+mage config set repo teilorbarcelos/mage-patterns
+```
+
+Mage will:
+1. Ask for a local path (defaults to `~/mage-cli-config/mage-patterns`)
+2. Check if the remote repository is empty or has content.
+3. Automatically **clone** (if content exists) or **scaffold** (if empty) the local repository.
+4. Initialize and connect the local git to your remote.
+
 ### Local Config
 
 Created with `mage config init`. Generates a `.magerc.json` in your project root:

@@ -3,6 +3,7 @@ export interface MageRepository {
   name: string;
   branch: string;
   token?: string;
+  localPath?: string;
 }
 
 export interface MageAI {
