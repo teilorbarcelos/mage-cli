@@ -4,21 +4,21 @@
  */
 
 export const MAGE_CLI_CAPABILITIES = `
-### Configuração (\`mage config\`)
-- \`set <key> <value>\`: Define configurações globais (\`repo\`, \`repo-branch\`, \`repo-token\`, \`ai-provider\`, \`ai-model\`, \`ai-key\`).
-- \`list-ai-models\`: Lista os modelos suportados pelo provedor atual.
-- \`show\`: Exibe a configuração ativa consolidada (Global + Local).
-- \`init\`: Inicializa um arquivo \`.magerc.json\` local no diretório do projeto.
+### Configuration (\`mage config\`)
+- \`set <key> <value>\`: Set global configurations (\`repo\`, \`repo-branch\`, \`repo-token\`, \`ai-provider\`, \`ai-model\`, \`ai-key\`).
+- \`list-ai-models\`: List supported models for the current provider.
+- \`show\`: Display the consolidated active configuration (Global + Local).
+- \`init\`: Initialize a local \`.magerc.json\` file in the project directory.
 
 ### Patterns & Git (\`mage patterns\`)
-- \`list\`: Lista patterns filtrando por scope ou framework.
-- \`add <caminho>\`: Adiciona um arquivo ou pasta local como um novo pattern (com templatização automática).
-- \`update <nome> [caminho]\`: Atualiza o conteúdo de um pattern existente.
-- \`remove <nome>\`: Remove um pattern do repositório e do manifest.
-- \`branch list/create/switch/delete\`: Gerenciamento completo de branches de patterns.
-- \`sync/push/pull\`: Mantém seu repositório de patterns sincronizado com o GitHub.
+- \`list\`: List patterns filtering by scope or framework.
+- \`add <path>\`: Add a local file or folder as a new pattern (with automatic templatization).
+- \`update <name> [path]\`: Update the content of an existing pattern.
+- \`remove <name>\`: Remove a pattern from the repository and manifest.
+- \`branch list/create/switch/delete\`: Full patterns branch management.
+- \`sync/push/pull\`: Keep your patterns repository synchronized with GitHub.
 
-### IA & Automação
-- \`do [prompt]\`: O Agente Inteligente analisa, decide e executa.
-- \`generate [pattern] [name]\`: O gerador padrão com assistência de IA opcional.
+### AI & Automation
+- \`do [prompt]\`: The Intelligent Agent analyzes, decides, and executes.
+- \`generate [pattern] [name]\`: Standard generator with optional AI assistance.
 `;
