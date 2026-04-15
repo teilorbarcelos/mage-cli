@@ -1,31 +1,19 @@
 #!/usr/bin/env node
 
 import { Command } from "commander";
-import * as packageJson from "../package.json";
-import { init } from "./fn/init";
+import { registerConfigCommand } from "./commands/config";
+import { registerGenerateCommand } from "./commands/generate";
+import { registerPatternsCommand } from "./commands/patterns";
 
 const program = new Command();
 
-program.version(packageJson.version);
-
 program
-  .command("init")
-  .description("Initialize the project with configuration files")
-  .action(() => {
-    init();
-  });
+  .name("mage")
+  .description("AI-powered CLI for web development with pluggable pattern repositories")
+  .version("2.0.0");
 
-program
-  .command("create <framework> <resource> [name]")
-  .description("Create a framework resource with a specific name")
-  .action((framework: string, resource: string, name?: string) => {
-    const Command = require(`./${framework}/${resource}`).default;
-
-    try {
-      Command(name);
-    } catch (error) {
-      console.error(`Command not found for ${framework}/${resource}`);
-    }
-  });
+registerConfigCommand(program);
+registerGenerateCommand(program);
+registerPatternsCommand(program);
 
 program.parse(process.argv);
