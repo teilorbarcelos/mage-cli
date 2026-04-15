@@ -1,30 +1,11 @@
-import OpenAI from "openai";
-import { MageAI, PatternManifestEntry, GeneratedFile } from "../config/schema";
+import { MageAI, PatternManifestEntry, GeneratedFile, AIDecision } from "../config/schema";
 import {
   buildPatternSelectionPrompt,
   buildCodeGenerationPrompt,
+  buildAgentPrompt,
 } from "./prompts";
 import * as logger from "../utils/logger";
-
-interface AIDecisionUsePattern {
-  decision: "use_pattern";
-  patternIndex: number;
-  reasoning: string;
-  variables: Record<string, string>;
-}
-
-interface AIDecisionCreateNew {
-  decision: "create_new";
-  patternIndex: null;
-  reasoning: string;
-  files: GeneratedFile[];
-}
-
-type AIDecision = AIDecisionUsePattern | AIDecisionCreateNew;
-
-function createOpenAIClient(config: MageAI): OpenAI {
-  return new OpenAI({ apiKey: config.apiKey });
-}
+import { getAIProvider } from "./providers";
 
 export async function askAIForDecision(
   config: MageAI,
@@ -32,27 +13,18 @@ export async function askAIForDecision(
   resourceDescription: string,
   patterns: PatternManifestEntry[]
 ): Promise<AIDecision> {
-  const client = createOpenAIClient(config);
+  const provider = getAIProvider(config);
   const prompt = buildPatternSelectionPrompt(
     resourceName,
     resourceDescription,
     patterns
   );
 
-  const spin = logger.spinner("AI is analyzing available patterns...");
+  const spin = logger.spinner(`AI (${config.provider}) is analyzing patterns...`);
 
   try {
-    const response = await client.chat.completions.create({
-      model: config.model,
-      messages: [{ role: "user", content: prompt }],
-      temperature: 0.3,
-      response_format: { type: "json_object" },
-    });
-
-    const content = response.choices[0]?.message?.content;
-    if (!content) throw new Error("Empty AI response");
-
-    const decision = JSON.parse(content) as AIDecision;
+    const decision = await provider.generateJSON<AIDecision>(prompt);
+    
     spin.succeed(
       `AI decided: ${decision.decision === "use_pattern" ? "use existing pattern" : "create from scratch"}`
     );
@@ -60,7 +32,7 @@ export async function askAIForDecision(
 
     return decision;
   } catch (err) {
-    spin.fail("AI analysis failed");
+    spin.fail(`AI (${config.provider}) analysis failed`);
     throw err;
   }
 }
@@ -71,31 +43,50 @@ export async function askAIToGenerate(
   resourceDescription: string,
   framework: string
 ): Promise<GeneratedFile[]> {
-  const client = createOpenAIClient(config);
+  const provider = getAIProvider(config);
   const prompt = buildCodeGenerationPrompt(
     resourceName,
     resourceDescription,
     framework
   );
 
-  const spin = logger.spinner("AI is generating code...");
+  const spin = logger.spinner(`AI (${config.provider}) is generating code...`);
 
   try {
-    const response = await client.chat.completions.create({
-      model: config.model,
-      messages: [{ role: "user", content: prompt }],
-      temperature: 0.4,
-      response_format: { type: "json_object" },
-    });
-
-    const content = response.choices[0]?.message?.content;
-    if (!content) throw new Error("Empty AI response");
-
-    const result = JSON.parse(content) as { files: GeneratedFile[] };
+    const result = await provider.generateJSON<{ files: GeneratedFile[] }>(prompt);
     spin.succeed(`AI generated ${result.files.length} file(s)`);
     return result.files;
   } catch (err) {
-    spin.fail("AI code generation failed");
+    spin.fail(`AI (${config.provider}) code generation failed`);
+    throw err;
+  }
+}
+
+export async function askAIAgent(
+  ai: MageAI,
+  userInput: string,
+  availablePatterns: PatternManifestEntry[],
+  projectContext: string = "",
+  projectTree: string = "",
+  essentialFiles: { path: string; content: string }[] = []
+): Promise<AIDecision> {
+  const provider = getAIProvider(ai);
+  const prompt = buildAgentPrompt(userInput, availablePatterns, projectContext, projectTree, essentialFiles);
+
+  const spin = logger.spinner(`Mage Agent (${ai.provider}) is thinking...`);
+
+  try {
+    const decision = await provider.generateJSON<AIDecision>(prompt);
+    
+    if (!decision || !decision.decision) {
+      spin.fail("Agent returned an invalid response structure.");
+      throw new Error("AI Agent decision is missing from response.");
+    }
+
+    spin.succeed(`Agent decision: ${decision.decision.replace("_", " ")}`);
+    return decision;
+  } catch (err) {
+    spin.fail("Agent failed to process request");
     throw err;
   }
 }

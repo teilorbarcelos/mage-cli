@@ -23,5 +23,13 @@ export function readJsonFile<T>(filePath: string): T {
 }
 
 export function resolveFromCwd(...segments: string[]): string {
-  return path.resolve(process.cwd(), ...segments);
+  // Ensure that no segment starts with a slash, which would make path.resolve
+  // treat it as an absolute path from the system root.
+  const sanitizedSegments = segments.map((s, i) => {
+    if (i > 0 && s.startsWith(path.sep)) {
+      return s.substring(1);
+    }
+    return s;
+  });
+  return path.resolve(process.cwd(), ...sanitizedSegments);
 }

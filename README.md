@@ -1,287 +1,111 @@
 # ⚡ mage
 
-**AI-assisted code generation driven by your own patterns.**
+**Automação e geração de código orientada por patterns e inteligência artificial.**
 
-Mage is a CLI that combines user-defined code patterns with AI to accelerate web development. You maintain a GitHub repository of reusable templates — components, pages, hooks, services, anything — and Mage uses AI to intelligently select and apply them, or generate entirely new code when no pattern fits.
+Mage é uma CLI avançada para desenvolvedores que desejam escalar padrões de projeto. Ela permite que você mantenha um repositório centralizado de patterns (componentes, hooks, serviços, etc.) e use IA para aplicá-los de forma inteligente ou gerar novas soluções autônomas no terminal.
 
-### Advantages
+---
 
-- **You own the patterns** — your templates live in a GitHub repo you control, not locked inside the CLI. Update once, every project benefits instantly.
-- **AI decides, you save tokens** — instead of generating every file from scratch, AI picks from your existing patterns when one fits. Templates are rendered locally at zero token cost.
-- **Works with or without AI** — no API key configured? Mage falls back to an interactive pattern picker. AI enhances the workflow, it doesn't gate it.
-- **Framework agnostic** — React, Next.js, Node, or anything else. Patterns are organized by framework, and you define the structure.
-- **Zero boilerplate, one command** — `mage generate component UserCard` handles everything: pattern selection, variable prompts, file creation.
+## 🚀 Guia de Descoberta (AI/Agent Protocol)
 
-## Install
+Para testar a CLI em sequência, siga estas 5 fases fundamentais:
 
-```bash
-npm install -g mage-cli
-```
-
-## Quick Start
+### Fase 1: Configuração do Ambiente
+Primeiro, conecte a CLI ao seu repositório de padrões e configure o provedor de IA.
 
 ```bash
-# 1. Point Mage to your patterns repository
-mage config set repo your-username/your-patterns-repo
+# 1. Configurar o repositório de patterns (detecta automaticamente clone ou scaffold)
+mage config set repo seu-usuario/sua-repo-patterns
 
-# 2. (Optional) Add an AI key for intelligent pattern selection
-mage config set ai-key sk-your-openai-key
+# 2. Listar modelos disponíveis para garantir o nome exato (Discovery)
+mage config list-ai-models
 
-# 3. Generate code
-mage generate component UserCard
-```
+# 3. Configurar Provedor e Chave de IA
+mage config set ai-provider gemini
+mage config set ai-model gemini-3.1-flash
+mage config set ai-key SUA_CHAVE_AQUI
 
-## Commands
-
-### `mage config`
-
-Manage global and project-level configuration.
-
-```bash
-# Set the patterns repository (owner/name format)
-mage config set repo teilorbarcelos/mage-patterns
-
-# Set the repository branch (defaults to "main")
-mage config set repo-branch develop
-
-# Set a GitHub token (required for private repos)
-mage config set repo-token ghp_xxxxxxxxxxxx
-
-# Set an OpenAI API key for AI-assisted generation
-mage config set ai-key sk-xxxxxxxxxxxx
-
-# Set the AI model (defaults to "gpt-4o")
-mage config set ai-model gpt-4o-mini
-
-# Show the active merged configuration
+# 4. Verificar a configuração salva
 mage config show
-
-# Create a local .magerc.json in the current project
-mage config init
 ```
 
-### `mage generate`
-
-Generate code from patterns or with AI assistance. Aliased as `mage g`.
+### Fase 2: Gestão de Patterns e Branches
+A Mage permite isolar patterns em diferentes branches. Use isso para organizar projetos.
 
 ```bash
-# AI decides the best approach (requires ai-key)
-mage generate component LoginForm
+# Listar as branches existentes no seu repositório remoto
+mage patterns branch list
 
-# Filter by framework
-mage generate component Header --framework react
+# Criar uma nova branch para um projeto específico (copiando da main)
+mage patterns branch create projeto-alpha --copy-from main
 
-# Add a description to help AI make better decisions
-mage generate hook Auth --description "handles JWT authentication with refresh tokens"
-
-# Without AI key — interactive pattern picker
-mage generate
+# Alternar para a nova branch em seu ambiente local
+mage patterns branch switch projeto-alpha
 ```
 
-**How it works:**
-
-| Scenario | What happens | Tokens used |
-|----------|-------------|-------------|
-| AI key set + pattern matches | AI picks pattern, Handlebars renders it | ~300 |
-| AI key set + no pattern fits | AI generates code from scratch | ~1000+ |
-| No AI key | You pick a pattern from an interactive list | 0 |
-
-### `mage patterns`
-
-Browse, manage, and initialize patterns repositories.
+### Fase 3: Sincronização e Patterns
+Garanta que seu cache local está em dia com os patterns definidos na branch ativa.
 
 ```bash
-# Create a new patterns repo connected to a remote
-mage patterns init git@github.com:your-user/your-patterns.git
-
-# Create in a custom directory name
-mage patterns init git@github.com:your-user/your-patterns.git --dir my-patterns
-
-# List all available patterns
+# Listar patterns disponíveis organizados por escopo (frontend/backend)
 mage patterns list
 
-# Filter patterns by framework
-mage patterns list --framework react
-
-# Force refresh the local cache
+# Forçar sincronização do manifest.json se você o editou recentemente no GitHub
 mage patterns sync
+
+# Puxar ou enviar alterações do repositório local de patterns
+mage patterns pull
+mage patterns push
 ```
 
-The `init` command creates a ready-to-use patterns repository with:
-- `manifest.json` — pattern index
-- A starter React component pattern as example
-- Git initialized with the remote already configured
-- Just `git push -u origin main` to publish
-
-## Configuration
-
-Mage uses a hierarchical configuration system. Settings are merged in order of priority:
-
-```
-CLI flags  →  Local .magerc.json  →  Global ~/.mage/config.json
-(highest)                              (lowest)
-```
-
-### Global Config
-
-Stored at `~/.mage/config.json`. Set via `mage config set <key> <value>`.
-
-### Local Config
-
-Created with `mage config init`. Generates a `.magerc.json` in your project root:
-
-```json
-{
-  "repository": {
-    "owner": "your-username",
-    "name": "your-patterns-repo",
-    "branch": "main"
-  },
-  "ai": {
-    "provider": "openai",
-    "apiKey": "sk-...",
-    "model": "gpt-4o"
-  },
-  "paths": {
-    "components": "src/components",
-    "pages": "src/pages",
-    "hooks": "src/hooks",
-    "services": "src/services",
-    "lib": "src/lib"
-  }
-}
-```
-
-> **Tip:** Add `.magerc.json` to your `.gitignore` if it contains API keys.
-
-## Patterns Repository
-
-Mage reads patterns from any GitHub repository that follows this structure:
-
-```
-your-patterns-repo/
-├── manifest.json
-├── react/
-│   ├── component/
-│   │   ├── pattern.json
-│   │   └── template/
-│   │       ├── {{pascalCase name}}/
-│   │       │   ├── index.tsx.hbs
-│   │       │   └── styles.module.css.hbs
-│   ├── hook/
-│   └── service/
-└── next/
-    ├── component/
-    └── page/
-```
-
-### manifest.json
-
-An index of every available pattern:
-
-```json
-{
-  "version": "1.0.0",
-  "patterns": [
-    {
-      "name": "component",
-      "description": "React functional component with CSS Modules and TypeScript",
-      "framework": "react",
-      "category": "component",
-      "path": "react/component",
-      "files": ["{{pascalCase name}}/index.tsx.hbs", "{{pascalCase name}}/styles.module.css.hbs"]
-    }
-  ]
-}
-```
-
-### pattern.json
-
-Metadata and variables for each pattern. This is what the AI reads to make decisions:
-
-```json
-{
-  "name": "component",
-  "description": "React functional component with CSS Modules and TypeScript",
-  "framework": "react",
-  "category": "component",
-  "variables": [
-    {
-      "name": "name",
-      "description": "Component name (e.g. UserCard)",
-      "required": true
-    }
-  ]
-}
-```
-
-### Template Helpers
-
-Templates use [Handlebars](https://handlebarsjs.com/) with built-in helpers:
-
-| Helper | Input | Output |
-|--------|-------|--------|
-| `{{pascalCase name}}` | `user card` | `UserCard` |
-| `{{camelCase name}}` | `user card` | `userCard` |
-| `{{lowercase name}}` | `UserCard` | `usercard` |
-| `{{uppercase name}}` | `user` | `USER` |
-| `{{capitalize name}}` | `user` | `User` |
-
-## Development
+### Fase 4: Inteligência Autônoma (The Agent Mode)
+Este é o recurso mais poderoso. O comando `do` decide entre usar um pattern, gerar código ou rodar comandos de sistema.
 
 ```bash
-# Clone the repo
-git clone https://github.com/teilorbarcelos/mage-cli.git
-cd mage-cli
+# Teste de Geração Inteligente: IA escolhe entre pattern ou criação manual
+mage do "crie um componente UserProfile com avatar e bio"
 
-# Install dependencies
-npm install
-
-# Run in dev mode (TypeScript, no build step)
-npm run dev -- --help
-npm run dev -- config show
-npm run dev -- generate component TestButton
-
-# Type check
-npm run typecheck
-
-# Build
-npm run build
-
-# Install globally for local testing (no sudo required)
-npm run link:local
-
-# Now use it anywhere
-mage --help
+# Teste de Autonomia Terminal: IA propõe comandos shell para você
+mage do "inicialize um projeto vite com typescript"
 ```
 
-### Scripts Reference
+### Fase 5: Workflow Estruturado
+Use para automação rápida baseada em patterns conhecidos.
 
-| Script | Description |
-|--------|-------------|
-| `npm run dev` | Run CLI directly from TypeScript source |
-| `npm run build` | Bundle with tsup |
-| `npm run typecheck` | Validate types without emitting |
-| `npm run test` | Run tests with Vitest |
-| `npm run link:local` | Build + install globally via npm link |
-| `npm run bump:patch` | Bump patch version (2.0.0 → 2.0.1) |
-| `npm run bump:minor` | Bump minor version (2.0.0 → 2.1.0) |
-| `npm run bump:major` | Bump major version (2.0.0 → 3.0.0) |
-| `npm run release` | Bump patch + publish to npm |
+```bash
+# Geração direta usando um nome de pattern específico
+mage generate component Navbar
 
-## Tech Stack
+# Geração com ajuda da IA para preencher variáveis
+mage generate --description "Um formulário de contato com validação Yup"
+```
 
-- **[Commander](https://github.com/tj/commander.js)** — CLI framework
-- **[Inquirer](https://github.com/SBoudrias/Inquirer.js)** — Interactive prompts
-- **[Handlebars](https://handlebarsjs.com/)** — Template engine
-- **[@octokit/rest](https://github.com/octokit/rest.js)** — GitHub API client
-- **[OpenAI SDK](https://github.com/openai/openai-node)** — AI integration
-- **[Cosmiconfig](https://github.com/cosmiconfig/cosmiconfig)** — Configuration loader
-- **[Chalk](https://github.com/chalk/chalk)** + **[Ora](https://github.com/sindresorhus/ora)** — Terminal styling
-- **[tsup](https://github.com/egoist/tsup)** — Bundler
-- **[tsx](https://github.com/privatenumber/tsx)** — TypeScript execution
-- **[Vitest](https://vitest.dev/)** — Test framework
+---
 
-## License
+## 🛠 Manual de Comandos
 
-MIT © [Teilor Barcelos](https://github.com/teilorbarcelos)
+<!-- START_MAGE_MANUAL -->
+### Configuração (`mage config`)
+- `set <key> <value>`: Define configurações globais (`repo`, `repo-branch`, `repo-token`, `ai-provider`, `ai-model`, `ai-key`).
+- `list-ai-models`: Lista os modelos suportados pelo provedor atual.
+- `show`: Exibe a configuração ativa consolidada (Global + Local).
+- `init`: Inicializa um arquivo `.magerc.json` local no diretório do projeto.
+
+### Patterns & Git (`mage patterns`)
+- `list`: Lista patterns filtrando por scope ou framework.
+- `add <caminho>`: Adiciona um arquivo ou pasta local como um novo pattern (com templatização automática).
+- `update <nome> [caminho]`: Atualiza o conteúdo de um pattern existente.
+- `remove <nome>`: Remove um pattern do repositório e do manifest.
+- `branch list/create/switch/delete`: Gerenciamento completo de branches de patterns.
+- `sync/push/pull`: Mantém seu repositório de patterns sincronizado com o GitHub.
+
+### IA & Automação
+- `do [prompt]`: O Agente Inteligente analisa, decide e executa.
+- `generate [pattern] [name]`: O gerador padrão com assistência de IA opcional.
+<!-- END_MAGE_MANUAL -->
+
+## 🔒 Segurança
+O comando `do`, ao sugerir comandos de terminal (`run_commands`), **sempre** solicitará sua confirmação explicativa antes de executar qualquer ação no shell.
+
+---
+**Tech Stack:** Commander, Inquirer, Handlebars, OpenAI & Google Gemini SDKs, TSUP.

@@ -3,10 +3,11 @@ export interface MageRepository {
   name: string;
   branch: string;
   token?: string;
+  localPath?: string;
 }
 
 export interface MageAI {
-  provider: "openai";
+  provider: "openai" | "gemini";
   apiKey: string;
   model: string;
 }
@@ -24,11 +25,13 @@ export interface MageConfig {
   repository?: MageRepository;
   ai?: MageAI;
   paths?: MagePaths;
+  treeDepth?: number;
 }
 
 export interface PatternManifestEntry {
   name: string;
   description: string;
+  scope: "frontend" | "backend";
   framework: string;
   category: string;
   path: string;
@@ -43,6 +46,7 @@ export interface PatternManifest {
 export interface PatternMeta {
   name: string;
   description: string;
+  scope: "frontend" | "backend";
   framework: string;
   category: string;
   variables: PatternVariable[];
@@ -58,4 +62,14 @@ export interface PatternVariable {
 export interface GeneratedFile {
   relativePath: string;
   content: string;
+}
+
+export interface AIDecision {
+  decision: "use_pattern" | "create_new" | "run_commands" | "read_files" | "modify_files" | "delete_files";
+  reasoning: string;
+  patternIndex?: number;
+  variables?: Record<string, string>;
+  files?: GeneratedFile[];
+  commands?: string[];
+  requestedFiles?: string[];
 }

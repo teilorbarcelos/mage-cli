@@ -23,15 +23,13 @@ export function registerGenerateCommand(program: Command): void {
     .alias("g")
     .description("Generate code from a pattern or with AI assistance")
     .option("-d, --description <desc>", "Describe what you want to generate")
-    .option(
-      "-f, --framework <framework>",
-      "Filter patterns by framework"
-    )
+    .option("-f, --framework <framework>", "Filter patterns by framework")
+    .option("-s, --scope <scope>", "Filter by scope (frontend or backend)")
     .action(
       async (
         pattern: string | undefined,
         name: string | undefined,
-        options: { description?: string; framework?: string }
+        options: { description?: string; framework?: string; scope?: string }
       ) => {
         const config = await loadConfig();
 
@@ -44,6 +42,12 @@ export function registerGenerateCommand(program: Command): void {
 
         const manifest = await fetchManifest(config.repository);
         let availablePatterns = manifest.patterns;
+
+        if (options.scope) {
+          availablePatterns = availablePatterns.filter(
+            (p) => p.scope.toLowerCase() === options.scope!.toLowerCase()
+          );
+        }
 
         if (options.framework) {
           availablePatterns = availablePatterns.filter(
@@ -87,6 +91,10 @@ async function generateWithAI(
   );
 
   if (decision.decision === "use_pattern") {
+    if (decision.patternIndex === undefined) {
+      logger.error("AI selected use_pattern but no pattern index was provided.");
+      process.exit(1);
+    }
     const selectedPattern = patterns[decision.patternIndex - 1];
     if (!selectedPattern) {
       logger.error("AI selected an invalid pattern index");
@@ -100,14 +108,14 @@ async function generateWithAI(
     const files = await buildFilesFromPattern(
       config,
       selectedPattern,
-      decision.variables
+      decision.variables!
     );
     const destDir = resolveDestinationDir(config, selectedPattern.category);
     writeGeneratedFiles(files, destDir);
   } else {
     logger.info("AI is creating custom code...");
     const destDir = config.paths?.components || "src";
-    writeGeneratedFiles(decision.files, destDir);
+    writeGeneratedFiles(decision.files!, destDir);
   }
 }
 
@@ -144,7 +152,7 @@ async function generateFromPattern(
     selectedPattern = found;
   } else {
     const choices = patterns.map((p) => ({
-      name: `${p.framework}/${p.category}/${p.name} — ${p.description}`,
+      name: `[${p.scope}] ${p.framework}/${p.category}/${p.name} — ${p.description}`,
       value: p,
     }));
 
@@ -200,7 +208,7 @@ async function collectVariables(
   return variables;
 }
 
-async function buildFilesFromPattern(
+export async function buildFilesFromPattern(
   config: MageConfig,
   pattern: PatternManifestEntry,
   variables: Record<string, string>
@@ -225,7 +233,7 @@ async function buildFilesFromPattern(
   return files;
 }
 
-function resolveDestinationDir(
+export function resolveDestinationDir(
   config: MageConfig,
   category: string
 ): string {
