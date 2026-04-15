@@ -1,111 +1,111 @@
 # ⚡ mage
 
-**Automação e geração de código orientada por patterns e inteligência artificial.**
+**Automation and code generation driven by patterns and artificial intelligence.**
 
-Mage é uma CLI avançada para desenvolvedores que desejam escalar padrões de projeto. Ela permite que você mantenha um repositório centralizado de patterns (componentes, hooks, serviços, etc.) e use IA para aplicá-los de forma inteligente ou gerar novas soluções autônomas no terminal.
+Mage is an advanced CLI for developers who want to scale project patterns. It allows you to maintain a centralized repository of patterns (components, hooks, services, etc.) and uses AI to intelligently apply them or generate new autonomous solutions directly in your terminal.
 
 ---
 
-## 🚀 Guia de Descoberta (AI/Agent Protocol)
+## 🚀 Discovery Guide (AI/Agent Protocol)
 
-Para testar a CLI em sequência, siga estas 5 fases fundamentais:
+To test the CLI in sequence, follow these 5 fundamental phases:
 
-### Fase 1: Configuração do Ambiente
-Primeiro, conecte a CLI ao seu repositório de padrões e configure o provedor de IA.
+### Phase 1: Environment Setup
+First, connect the CLI to your patterns repository and configure the AI provider.
 
 ```bash
-# 1. Configurar o repositório de patterns (detecta automaticamente clone ou scaffold)
-mage config set repo seu-usuario/sua-repo-patterns
+# 1. Configure the patterns repository (automatically detects clone or scaffold)
+mage config set repo your-user/your-patterns-repo
 
-# 2. Listar modelos disponíveis para garantir o nome exato (Discovery)
+# 2. List available models to ensure the exact name (Discovery)
 mage config list-ai-models
 
-# 3. Configurar Provedor e Chave de IA
+# 3. Configure AI Provider and API Key
 mage config set ai-provider gemini
-mage config set ai-model gemini-3.1-flash
-mage config set ai-key SUA_CHAVE_AQUI
+mage config set ai-model gemini-1.5-flash
+mage config set ai-key YOUR_KEY_HERE
 
-# 4. Verificar a configuração salva
+# 4. Verify the active configuration
 mage config show
 ```
 
-### Fase 2: Gestão de Patterns e Branches
-A Mage permite isolar patterns em diferentes branches. Use isso para organizar projetos.
+### Phase 2: Patterns and Branches Management
+Mage allows you to isolate patterns in different branches. Use this to organize projects.
 
 ```bash
-# Listar as branches existentes no seu repositório remoto
+# List existing branches in your remote repository
 mage patterns branch list
 
-# Criar uma nova branch para um projeto específico (copiando da main)
-mage patterns branch create projeto-alpha --copy-from main
+# Create a new branch for a specific project (copying from main)
+mage patterns branch create project-alpha --copy-from main
 
-# Alternar para a nova branch em seu ambiente local
-mage patterns branch switch projeto-alpha
+# Switch to the new branch in your local environment
+mage patterns branch switch project-alpha
 ```
 
-### Fase 3: Sincronização e Patterns
-Garanta que seu cache local está em dia com os patterns definidos na branch ativa.
+### Phase 3: Synchronization and Patterns
+Ensure your local cache is up to date with the patterns defined in the active branch.
 
 ```bash
-# Listar patterns disponíveis organizados por escopo (frontend/backend)
+# List available patterns organized by scope (frontend/backend)
 mage patterns list
 
-# Forçar sincronização do manifest.json se você o editou recentemente no GitHub
+# Force synchronization of manifest.json if you recently edited it on GitHub
 mage patterns sync
 
-# Puxar ou enviar alterações do repositório local de patterns
+# Pull or push changes from your local patterns repository
 mage patterns pull
 mage patterns push
 ```
 
-### Fase 4: Inteligência Autônoma (The Agent Mode)
-Este é o recurso mais poderoso. O comando `do` decide entre usar um pattern, gerar código ou rodar comandos de sistema.
+### Phase 4: Autonomous Intelligence (The Agent Mode)
+This is the most powerful feature. The `do` command decides between using a pattern, generating code, or running system commands.
 
 ```bash
-# Teste de Geração Inteligente: IA escolhe entre pattern ou criação manual
-mage do "crie um componente UserProfile com avatar e bio"
+# Intelligent Generation Test: AI chooses between a pattern or manual creation
+mage do "create a UserProfile component with avatar and bio"
 
-# Teste de Autonomia Terminal: IA propõe comandos shell para você
-mage do "inicialize um projeto vite com typescript"
+# Terminal Autonomy Test: AI proposes shell commands for you
+mage do "initialize a vite project with typescript"
 ```
 
-### Fase 5: Workflow Estruturado
-Use para automação rápida baseada em patterns conhecidos.
+### Phase 5: Structured Workflow
+Use for fast automation based on known patterns.
 
 ```bash
-# Geração direta usando um nome de pattern específico
+# Direct generation using a specific pattern name
 mage generate component Navbar
 
-# Geração com ajuda da IA para preencher variáveis
-mage generate --description "Um formulário de contato com validação Yup"
+# Generation with AI assistance to fill variables
+mage generate --description "A contact form with Yup validation"
 ```
 
 ---
 
-## 🛠 Manual de Comandos
+## 🛠 Command Manual
 
 <!-- START_MAGE_MANUAL -->
-### Configuração (`mage config`)
-- `set <key> <value>`: Define configurações globais (`repo`, `repo-branch`, `repo-token`, `ai-provider`, `ai-model`, `ai-key`).
-- `list-ai-models`: Lista os modelos suportados pelo provedor atual.
-- `show`: Exibe a configuração ativa consolidada (Global + Local).
-- `init`: Inicializa um arquivo `.magerc.json` local no diretório do projeto.
+### Configuration (`mage config`)
+- `set <key> <value>`: Set global configurations (`repo`, `repo-branch`, `repo-token`, `ai-provider`, `ai-model`, `ai-key`).
+- `list-ai-models`: List supported models for the current provider.
+- `show`: Display the consolidated active configuration (Global + Local).
+- `init`: Initialize a local `.magerc.json` file in the project directory.
 
 ### Patterns & Git (`mage patterns`)
-- `list`: Lista patterns filtrando por scope ou framework.
-- `add <caminho>`: Adiciona um arquivo ou pasta local como um novo pattern (com templatização automática).
-- `update <nome> [caminho]`: Atualiza o conteúdo de um pattern existente.
-- `remove <nome>`: Remove um pattern do repositório e do manifest.
-- `branch list/create/switch/delete`: Gerenciamento completo de branches de patterns.
-- `sync/push/pull`: Mantém seu repositório de patterns sincronizado com o GitHub.
+- `list`: List patterns filtering by scope or framework.
+- `add <path>`: Add a local file or folder as a new pattern (with automatic templatization).
+- `update <name> [path]`: Update the content of an existing pattern.
+- `remove <name>`: Remove a pattern from the repository and manifest.
+- `branch list/create/switch/delete`: Full patterns branch management.
+- `sync/push/pull`: Keep your patterns repository synchronized with GitHub.
 
-### IA & Automação
-- `do [prompt]`: O Agente Inteligente analisa, decide e executa.
-- `generate [pattern] [name]`: O gerador padrão com assistência de IA opcional.
+### AI & Automation
+- `do [prompt]`: The Intelligent Agent analyzes, decides, and executes.
+- `generate [pattern] [name]`: Standard generator with optional AI assistance.
 <!-- END_MAGE_MANUAL -->
 
-## 🔒 Segurança
-O comando `do`, ao sugerir comandos de terminal (`run_commands`), **sempre** solicitará sua confirmação explicativa antes de executar qualquer ação no shell.
+## 🔒 Security
+The `do` command, when suggesting terminal commands (`run_commands`), will **always** prompt for your explicit confirmation before executing any action in the shell.
 
 ---
 **Tech Stack:** Commander, Inquirer, Handlebars, OpenAI & Google Gemini SDKs, TSUP.
