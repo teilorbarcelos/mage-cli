@@ -132,3 +132,13 @@ export function scaffoldRepo(resolvedPath: string, gitUrl?: string): void {
     runGit("git push -u origin main", resolvedPath);
   }
 }
+
+export function scaffoldOrphanRepo(resolvedPath: string, branchName: string): void {
+  logger.info(`Creating orphan branch "${branchName}" and scaffolding...`);
+  runGit(`git checkout --orphan ${branchName}`, resolvedPath);
+  runGit("git rm -rf .", resolvedPath);
+  scaffoldRepo(resolvedPath);
+  runGit("git add .", resolvedPath);
+  runGit(`git commit -m "Orphan branch ${branchName} initialization"`, resolvedPath);
+  runGit(`git push origin ${branchName}`, resolvedPath);
+}

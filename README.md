@@ -91,21 +91,25 @@ mage generate
 Browse, manage, and initialize patterns repositories.
 
 ```bash
-# Create a new patterns repo connected to a remote
-# (you'll be asked where to create it, defaults to ~/your-patterns)
-mage patterns init git@github.com:your-user/your-patterns.git
-
 # List all available patterns
 mage patterns list
 
-# Filter patterns by framework
-mage patterns list --framework react
+# Manage branches
+mage patterns branch list                     # List all branches
+mage patterns branch create feature-patterns  # Create from active branch
+mage patterns branch create new-project --empty # Create clean orphan branch
+mage patterns branch switch feature-patterns  # Change active branch
+mage patterns branch delete old-branch        # Remove branch from remote
 
-# Force refresh the local cache
+# Synchronize local clone (requires localPath)
+mage patterns pull   # Update local patterns from GitHub
+mage patterns push   # Send local pattern changes to GitHub
+
+# Force refresh the local generation cache
 mage patterns sync
 ```
 
-The `init` command:
+The `init` command (or setting a repository via `config set repo`):
 1. Asks where to create the repository (defaults to `~/repo-name`)
 2. Scaffolds the full patterns structure with a starter example
 3. Initializes git with the remote already configured
