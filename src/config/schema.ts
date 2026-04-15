@@ -7,7 +7,7 @@ export interface MageRepository {
 }
 
 export interface MageAI {
-  provider: "openai";
+  provider: "openai" | "gemini";
   apiKey: string;
   model: string;
 }
@@ -25,6 +25,7 @@ export interface MageConfig {
   repository?: MageRepository;
   ai?: MageAI;
   paths?: MagePaths;
+  treeDepth?: number;
 }
 
 export interface PatternManifestEntry {
@@ -61,4 +62,14 @@ export interface PatternVariable {
 export interface GeneratedFile {
   relativePath: string;
   content: string;
+}
+
+export interface AIDecision {
+  decision: "use_pattern" | "create_new" | "run_commands" | "read_files" | "modify_files" | "delete_files";
+  reasoning: string;
+  patternIndex?: number;
+  variables?: Record<string, string>;
+  files?: GeneratedFile[];
+  commands?: string[];
+  requestedFiles?: string[];
 }

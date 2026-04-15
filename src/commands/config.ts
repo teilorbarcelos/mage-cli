@@ -9,15 +9,41 @@ import {
   writeLocalConfig,
   getGlobalConfigPath,
 } from "../config/loader";
-import { MageConfig } from "../config/schema";
+import { MageConfig, MageAI } from "../config/schema";
 import * as logger from "../utils/logger";
 import { fileExists } from "../utils/fs";
 import { isRemoteEmpty, scaffoldRepo, runGit } from "../utils/scaffold";
+import { getAIProvider } from "../ai/providers";
 
 export function registerConfigCommand(program: Command): void {
   const config = program
     .command("config")
     .description("Manage mage configuration (global and local)");
+
+  config
+    .command("list-ai-models")
+    .description("List available AI models for the current provider")
+    .action(async () => {
+      const merged = await loadConfig();
+      if (!merged.ai) {
+        logger.error("AI not configured.");
+        process.exit(1);
+      }
+      const provider = getAIProvider(merged.ai);
+      if ("listModels" in provider) {
+        const spin = logger.spinner("Fetching available models...");
+        try {
+          const models = await (provider as any).listModels();
+          spin.stop();
+          logger.header(`Available Models (${merged.ai.provider})`);
+          models.forEach((m: string) => console.log(`  - ${m}`));
+        } catch (err: any) {
+          spin.fail(`Failed to list models: ${err.message}`);
+        }
+      } else {
+        logger.warn(`Model listing not supported for ${merged.ai.provider} yet.`);
+      }
+    });
 
   config
     .command("set <key> <value>")
@@ -219,10 +245,31 @@ async function handleConfigSet(
       config.ai.model = value;
       logger.success(`Global config updated: ai-model = ${value}`);
       break;
+    case "ai-provider":
+      const provider = value.toLowerCase() as "openai" | "gemini";
+      if (provider !== "openai" && provider !== "gemini") {
+        logger.error('AI provider must be either "openai" or "gemini"');
+        process.exit(1);
+      }
+      config.ai = {
+        provider,
+        apiKey: config.ai?.apiKey || "",
+        model: config.ai?.model || (provider === "openai" ? "gpt-4o" : "gemini-2.5-flash"),
+      };
+      logger.success(`Global config updated: ai-provider = ${provider}`);
+      break;
     default:
       logger.error(
-        `Unknown config key: "${key}". Valid keys: repo, repo-branch, repo-token, ai-key, ai-model`
+        `Unknown config key: "${key}". Valid keys: repo, repo-branch, repo-token, ai-key, ai-model, ai-provider`
       );
       process.exit(1);
   }
+}
+
+export async function listAIModels(config: MageAI): Promise<string[]> {
+  const provider = getAIProvider(config);
+  if ("listModels" in provider) {
+    return (provider as any).listModels();
+  }
+  return [];
 }

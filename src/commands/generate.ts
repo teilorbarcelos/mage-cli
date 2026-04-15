@@ -91,6 +91,10 @@ async function generateWithAI(
   );
 
   if (decision.decision === "use_pattern") {
+    if (decision.patternIndex === undefined) {
+      logger.error("AI selected use_pattern but no pattern index was provided.");
+      process.exit(1);
+    }
     const selectedPattern = patterns[decision.patternIndex - 1];
     if (!selectedPattern) {
       logger.error("AI selected an invalid pattern index");
@@ -104,14 +108,14 @@ async function generateWithAI(
     const files = await buildFilesFromPattern(
       config,
       selectedPattern,
-      decision.variables
+      decision.variables!
     );
     const destDir = resolveDestinationDir(config, selectedPattern.category);
     writeGeneratedFiles(files, destDir);
   } else {
     logger.info("AI is creating custom code...");
     const destDir = config.paths?.components || "src";
-    writeGeneratedFiles(decision.files, destDir);
+    writeGeneratedFiles(decision.files!, destDir);
   }
 }
 
@@ -204,7 +208,7 @@ async function collectVariables(
   return variables;
 }
 
-async function buildFilesFromPattern(
+export async function buildFilesFromPattern(
   config: MageConfig,
   pattern: PatternManifestEntry,
   variables: Record<string, string>
@@ -229,7 +233,7 @@ async function buildFilesFromPattern(
   return files;
 }
 
-function resolveDestinationDir(
+export function resolveDestinationDir(
   config: MageConfig,
   category: string
 ): string {

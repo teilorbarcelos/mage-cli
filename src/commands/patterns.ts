@@ -12,12 +12,218 @@ import { clearCache } from "../github/cache";
 import { registerInitRepoCommand } from "./init-repo";
 import * as logger from "../utils/logger";
 import { runGit, scaffoldOrphanRepo } from "../utils/scaffold";
-import { fileExists } from "../utils/fs";
+import { fileExists, resolveFromCwd } from "../utils/fs";
+import { templatizeRecursive } from "../utils/extractor";
+import { addOrUpdatePatternInManifest, removePatternFromManifest } from "../utils/manifest";
+import fs from "fs";
+import path from "path";
 
 export function registerPatternsCommand(program: Command): void {
   const patterns = program
     .command("patterns")
     .description("Manage and browse the patterns repository");
+
+  patterns
+    .command("add <sourcePath>")
+    .description("Add a local file or directory as a new pattern")
+    .option("-f, --framework <framework>", "Framework (react, next, node, etc.)")
+    .option("-c, --category <category>", "Category (component, page, hook, etc.)")
+    .option("-s, --scope <scope>", "Scope (frontend or backend)", "frontend")
+    .option("-n, --name <name>", "Name of the pattern (defaults to basename)")
+    .action(async (sourcePath: string, options: { framework?: string; category?: string; scope?: "frontend" | "backend"; name?: string }) => {
+      const config = await loadConfig();
+      if (!config.repository?.localPath) {
+        logger.error("Local patterns repository not configured. Run 'mage config set repo' first.");
+        process.exit(1);
+      }
+
+      const absoluteSource = resolveFromCwd(sourcePath);
+      if (!fs.existsSync(absoluteSource)) {
+        logger.error(`Source path "${sourcePath}" does not exist.`);
+        process.exit(1);
+      }
+
+      const prompt = inquirer.createPromptModule();
+      const name = options.name || path.basename(sourcePath).split(".")[0];
+      
+      const answers = await prompt([
+        {
+          type: "input",
+          name: "framework",
+          message: "Framework (e.g., react, next):",
+          default: options.framework || "react",
+          when: !options.framework,
+        },
+        {
+          type: "list",
+          name: "category",
+          message: "Category:",
+          choices: ["component", "page", "hook", "service", "layout", "other"],
+          default: options.category || "component",
+          when: !options.category,
+        },
+        {
+          type: "input",
+          name: "description",
+          message: "Pattern description:",
+          default: `Pattern for ${name}`,
+        },
+      ]);
+
+      const framework = options.framework || answers.framework;
+      const category = options.category || answers.category;
+      const scope: "frontend" | "backend" = (options.scope === "backend" ? "backend" : "frontend");
+      const description = answers.description;
+
+      const patternRelativePath = `${scope}/${framework}/${category}/${name}`;
+      const patternDestDir = path.join(config.repository.localPath, patternRelativePath);
+
+      if (fs.existsSync(patternDestDir)) {
+        logger.warn(`Pattern "${name}" already exists in ${patternRelativePath}. Use 'update' to overwrite.`);
+        process.exit(1);
+      }
+
+      const spin = logger.spinner(`Extracting pattern "${name}"...`);
+      try {
+        // 1. Templatize and copy files
+        const files = templatizeRecursive(absoluteSource, {
+          sourceName: name,
+          targetDir: path.join(patternDestDir, "template"),
+        });
+
+        // 2. Write pattern.json
+        const patternMeta = {
+          name,
+          description,
+          scope,
+          framework,
+          category,
+          variables: [{ name: "name", description: "The resource name", required: true }],
+        };
+        fs.writeFileSync(path.join(patternDestDir, "pattern.json"), JSON.stringify(patternMeta, null, 2));
+
+        // 3. Update manifest.json
+        addOrUpdatePatternInManifest(config.repository.localPath, {
+          name,
+          description,
+          scope,
+          framework,
+          category,
+          path: patternRelativePath,
+          files,
+        });
+
+        spin.succeed(`Pattern "${name}" added locally at ${patternRelativePath}`);
+
+        // 4. Git Push
+        const { push } = await prompt([{ type: "confirm", name: "push", message: "Push change to remote repository?", default: true }]);
+        if (push) {
+          logger.info("Committing and pushing patterns...");
+          runGit(`git add .`, config.repository.localPath);
+          runGit(`git commit -m "feat: add pattern ${name}"`, config.repository.localPath);
+          runGit(`git push`, config.repository.localPath);
+          logger.success("Changes pushed to remote.");
+        }
+      } catch (err: any) {
+        spin.fail(`Failed to add pattern: ${err.message}`);
+      }
+    });
+
+  patterns
+    .command("remove <name>")
+    .description("Remove a pattern from the repository")
+    .action(async (name: string) => {
+      const config = await loadConfig();
+      if (!config.repository?.localPath) {
+        logger.error("Local patterns repository not configured.");
+        process.exit(1);
+      }
+
+      const manifest = await fetchManifest(config.repository);
+      const pattern = manifest.patterns.find(p => p.name === name);
+
+      if (!pattern) {
+        logger.error(`Pattern "${name}" not found in manifest.`);
+        process.exit(1);
+      }
+
+      const prompt = inquirer.createPromptModule();
+      const { confirm } = await prompt([{ type: "confirm", name: "confirm", message: `Are you sure you want to delete pattern "${name}"?`, default: false }]);
+
+      if (confirm) {
+        logger.info(`Removing ${pattern.path}...`);
+        fs.rmSync(path.join(config.repository.localPath, pattern.path), { recursive: true, force: true });
+        
+        removePatternFromManifest(config.repository.localPath, pattern.scope, pattern.framework, pattern.category, pattern.name);
+        
+        logger.success(`Pattern "${name}" removed locally.`);
+
+        const { push } = await prompt([{ type: "confirm", name: "push", message: "Push change to remote repository?", default: true }]);
+        if (push) {
+          runGit(`git add .`, config.repository.localPath);
+          runGit(`git commit -m "feat: remove pattern ${name}"`, config.repository.localPath);
+          runGit(`git push`, config.repository.localPath);
+          logger.success("Changes pushed to remote.");
+        }
+      }
+    });
+
+  patterns
+    .command("update <name> [sourcePath]")
+    .description("Update an existing pattern's template content")
+    .action(async (name: string, sourcePath: string | undefined) => {
+      const config = await loadConfig();
+      if (!config.repository?.localPath) {
+        logger.error("Local patterns repository not configured.");
+        process.exit(1);
+      }
+
+      const manifest = await fetchManifest(config.repository);
+      const pattern = manifest.patterns.find(p => p.name === name);
+
+      if (!pattern) {
+        logger.error(`Pattern "${name}" not found.`);
+        process.exit(1);
+      }
+
+      const absoluteSource = resolveFromCwd(sourcePath || name);
+      if (!fs.existsSync(absoluteSource)) {
+        logger.error(`Source path "${absoluteSource}" does not exist.`);
+        process.exit(1);
+      }
+
+      logger.info(`Updating pattern "${name}" content from ${absoluteSource}...`);
+      
+      const patternDestDir = path.join(config.repository.localPath, pattern.path);
+      
+      // Clear existing template
+      const templateDir = path.join(patternDestDir, "template");
+      fs.rmSync(templateDir, { recursive: true, force: true });
+
+      // Re-extract
+      const files = templatizeRecursive(absoluteSource, {
+        sourceName: name,
+        targetDir: templateDir,
+      });
+
+      // Update manifest
+      addOrUpdatePatternInManifest(config.repository.localPath, {
+        ...pattern,
+        files,
+      });
+
+      logger.success(`Pattern "${name}" updated successfully.`);
+      
+      const prompt = inquirer.createPromptModule();
+      const { push } = await prompt([{ type: "confirm", name: "push", message: "Push change to remote repository?", default: true }]);
+      if (push) {
+        runGit(`git add .`, config.repository.localPath);
+        runGit(`git commit -m "feat: update pattern ${name}"`, config.repository.localPath);
+        runGit(`git push`, config.repository.localPath);
+        logger.success("Changes pushed to remote.");
+      }
+    });
+
 
   patterns
     .command("list")

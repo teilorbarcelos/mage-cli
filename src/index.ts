@@ -4,16 +4,18 @@ import { Command } from "commander";
 import { registerConfigCommand } from "./commands/config";
 import { registerGenerateCommand } from "./commands/generate";
 import { registerPatternsCommand } from "./commands/patterns";
+import { registerDoCommand } from "./commands/do";
 
 const program = new Command();
 
 program
   .name("mage")
   .description("AI-powered CLI for web development with pluggable pattern repositories")
-  .version("2.0.0");
+  .version("2.1.0");
 
 registerConfigCommand(program);
 registerGenerateCommand(program);
 registerPatternsCommand(program);
+registerDoCommand(program);
 
 program.parse(process.argv);
