@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { cosmiconfig } from "cosmiconfig";
-import { MageConfig } from "./schema";
+import { MageConfig, MageProjectConfig } from "./schema";
 
 const MODULE_NAME = "mage";
 const GLOBAL_CONFIG_DIR = path.join(
@@ -30,45 +30,18 @@ export function writeGlobalConfig(config: MageConfig): void {
   fs.writeFileSync(GLOBAL_CONFIG_PATH, JSON.stringify(config, null, 2));
 }
 
-export async function readLocalConfig(): Promise<MageConfig> {
+export async function readLocalConfig(): Promise<MageProjectConfig> {
   const explorer = cosmiconfig(MODULE_NAME, {
     searchPlaces: [
-      ".magerc.json",
-      ".magerc.yaml",
-      ".magerc.yml",
-      ".magerc.js",
-      ".magerc.cjs",
+      "magerc.json"
     ],
   });
 
   const result = await explorer.search();
   if (result && !result.isEmpty) {
-    return result.config as MageConfig;
+    return result.config as MageProjectConfig;
   }
   return {};
-}
-
-export function writeLocalConfig(config: MageConfig): void {
-  const filePath = path.join(process.cwd(), ".magerc.json");
-  fs.writeFileSync(filePath, JSON.stringify(config, null, 2));
-}
-
-export async function loadConfig(): Promise<MageConfig> {
-  const globalConfig = readGlobalConfig();
-  const localConfig = await readLocalConfig();
-
-  return mergeConfigs(globalConfig, localConfig);
-}
-
-function mergeConfigs(global: MageConfig, local: MageConfig): MageConfig {
-  return {
-    repository: local.repository ?? global.repository,
-    ai: local.ai ?? global.ai,
-    paths: {
-      ...(global.paths || {}),
-      ...(local.paths || {}),
-    } as MageConfig["paths"],
-  };
 }
 
 export function getGlobalConfigPath(): string {
