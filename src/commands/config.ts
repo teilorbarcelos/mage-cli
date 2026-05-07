@@ -35,6 +35,8 @@ export function registerConfigCommand(program: Command): void {
         logger.dim("Menu URL: (not configured)");
       }
 
+      logger.keyValue("Show Animation", globalConfig.showAnimation === false ? "false" : "true");
+
       console.log();
       logger.dim(`Global config: ${getGlobalConfigPath()}`);
     });
@@ -57,9 +59,15 @@ async function handleConfigSet(
       logger.success(`Global config updated: menuUrl = ${finalUrl}`);
       break;
     }
+    case "show-animation": {
+      const isTrue = value.toLowerCase() === "true";
+      config.showAnimation = isTrue;
+      logger.success(`Global config updated: showAnimation = ${isTrue}`);
+      break;
+    }
     default:
       logger.error(
-        `Unknown config key: "${key}". Valid keys: menu-url`
+        `Unknown config key: "${key}". Valid keys: menu-url, show-animation`
       );
       process.exit(1);
   }

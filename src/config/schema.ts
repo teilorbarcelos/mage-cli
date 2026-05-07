@@ -1,5 +1,6 @@
 export interface MageConfig {
   menuUrl?: string;
+  showAnimation?: boolean;
 }
 
 export interface ScriptOption {

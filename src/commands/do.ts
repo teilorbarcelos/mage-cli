@@ -62,7 +62,7 @@ async function navigateMenu(menuData: any): Promise<any> {
       {
         type: "list",
         name: "selected",
-        message: "O que você deseja que eu faça?",
+        message: "What do you want me to do?",
         choices,
         pageSize: 10,
       },
@@ -140,7 +140,7 @@ export function registerDoCommand(program: Command): void {
             {
               type: "list",
               name: "selected",
-              message: "O que você deseja que eu faça?",
+              message: "What do you want me to do?",
               choices,
             },
           ]);
@@ -150,6 +150,10 @@ export function registerDoCommand(program: Command): void {
           }
 
           const script = localConfig.scripts[selected];
+          const globalConfig = readGlobalConfig();
+          if (globalConfig.showAnimation !== false) {
+            await logger.showWizardAnimation();
+          }
           logger.info(`Executing: ${script.command}`);
           try {
             execSync(script.command, { stdio: "inherit" });
@@ -192,6 +196,9 @@ export function registerDoCommand(program: Command): void {
         }
 
         const repoUrl = toSshUrl(boilerplate.url);
+        if (globalConfig.showAnimation !== false) {
+          await logger.showWizardAnimation();
+        }
         logger.info(`Cloning ${repoUrl} into ${projectName}...`);
         execSync(`git clone ${repoUrl} ${projectName}`, { stdio: "inherit" });
 
