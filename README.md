@@ -1,55 +1,72 @@
 # ⚡ mage
 
-**O Gerenciador Centralizado de Boilerplates Full-Stack.**
+**The Centralized Full-Stack Boilerplate Manager.**
 
-## 🎯 O Problema
+## 🎯 The Problem
 
-Todo desenvolvedor conhece a dor de iniciar um novo projeto:
-- *"Qual framework usar dessa vez?"*
-- *"Como eu configuro o TypeScript e o Linter mesmo?"*
-- *"Onde está aquele meu projeto antigo pra eu copiar a estrutura do banco de dados e as configurações do Docker?"*
+Every developer knows the pain of starting a new project:
+- *"Which framework should I use this time?"*
+- *"How do I configure TypeScript and Linter again?"*
+- *"Where is that old project of mine so I can copy the database structure and Docker configurations?"*
 
-A fadiga de configuração (Configuration Fatigue) nos faz perder horas preciosas apenas preparando o terreno, lidando com documentações desatualizadas e copiando e colando arquivos de projetos anteriores. Isso gera inconsistência na arquitetura, atrasa o início do desenvolvimento real e desmotiva a equipe.
+Configuration Fatigue makes us waste precious hours just preparing the ground, dealing with outdated documentation, and copying and pasting files from previous projects. This generates inconsistency in architecture, delays the start of real development, and demotivates the team.
 
-## 🚀 A Solução: Mage CLI
+## 🚀 The Solution: Mage CLI
 
-O **Mage CLI** nasceu para eliminar esse atrito. Ele funciona como um **hub unificado para todos os seus boilerplates**, sejam eles de frontend (React, Vue, Angular) ou backend (Node.js, Python, Java, PHP).
+**Mage CLI** was born to eliminate this friction. It works as a **unified hub for all your boilerplates**, whether they are frontend (React, Vue, Angular) or backend (Node.js, Python, Java, PHP).
 
-Em vez de decorar URLs de repositórios ou manter pastas de "projetos base" desatualizados na sua máquina, o Mage permite que você inicie qualquer arquitetura baseada em padrões sólidos em segundos, sempre baixando a versão mais recente direto da fonte. E o melhor: ele já renomeia o projeto e prepara o repositório git para você!
+Instead of memorizing repository URLs or keeping outdated "base project" folders on your machine, Mage allows you to start any architecture based on solid patterns in seconds, always downloading the latest version directly from the source. Best of all: it already renames the project and prepares the git repository for you!
 
 ---
 
-## 💻 Como Funciona
+## 💻 How it Works
 
-### 1. Configuração Global (Apenas uma vez)
-Conecte o Mage ao seu arquivo de menu (onde ficam mapeados os seus boilerplates):
+### 1. Global Configuration (Only once)
+Connect Mage to your menu file (where your boilerplates are mapped):
 
 ```bash
-mage config set menu-url file:///home/seu-usuario/projetos/mage-cli-menu/menu.json
-# Ou usando um arquivo remoto do GitHub:
-# mage config set menu-url https://raw.githubusercontent.com/usuario/repo/main/menu.json
+mage config set menu-url https://raw.githubusercontent.com/user/repo/main/menu.json
 ```
 
-### 2. Iniciando um Novo Projeto
-Basta rodar o comando principal no seu terminal:
+You can also toggle the wizard animation:
+```bash
+mage config set show-animation false # to disable
+mage config set show-animation true  # to enable (default)
+```
+
+To see your current configuration:
+```bash
+mage config show
+```
+
+### Help and Commands
+Mage CLI is self-documented. You can always see the available commands and options by running:
+```bash
+mage --help
+# Or for a specific command:
+# mage config --help
+```
+
+### 2. Starting a New Project
+Just run the main command in your terminal:
 
 ```bash
 mage do
 ```
 
-O Mage fará perguntas interativas e amigáveis:
-1. **O que você deseja que eu faça?** (Você navega por um menu com setas do teclado: *Frontend -> React*, etc.)
-2. **Qual o nome do novo projeto?**
+Mage will ask friendly and interactive questions:
+1. **What do you want me to do?** (You navigate through a menu with arrow keys: *Frontend -> React*, etc.)
+2. **What is the name of the new project?**
 
-Feito isso, o Mage clona o boilerplate em tempo real, remove o histórico `.git` original, aplica o novo nome configurado nos arquivos e inicializa o projeto limpo para você começar a programar imediatamente.
+Once done, Mage clones the boilerplate in real-time, removes the original `.git` history, applies the new configured name to the files, and initializes the clean project for you to start programming immediately.
 
-### 3. Comandos de Projeto (Project Scripts)
-Se você estiver dentro de um projeto que contém o arquivo `magerc.json`, o comando `mage do` entra no modo local. Ele lê os scripts padronizados do projeto e exibe um menu de execução rápida, ideal para rodar fluxos de trabalho sem precisar lembrar dos comandos exatos do Makefile ou npm:
+### 3. Project Commands (Project Scripts)
+If you are inside a project that contains the `magerc.json` file, the `mage do` command enters local mode. It reads the project's standardized scripts and displays a quick execution menu, ideal for running workflows without having to remember the exact Makefile or npm commands:
 
 ```bash
 ⚡ mage Project Scripts
 ──────────────────────────────────────────────────
-? O que você deseja que eu faça? (Use arrow keys)
+? What do you want me to do? (Use arrow keys)
 ❯ Start Development Server (make dev) 
   Run Tests (make test) 
   Generate CRUD (make generate) 
@@ -57,11 +74,11 @@ Se você estiver dentro de um projeto que contém o arquivo `magerc.json`, o com
 
 ---
 
-## ⚙️ Como configurar seus próprios Boilerplates
+## ⚙️ How to configure your own Boilerplates
 
-O Mage é totalmente independente. Para que um boilerplate tire proveito máximo da ferramenta, basta adicionar um arquivo `magerc.json` na raiz do seu repositório:
+Mage is completely independent. For a boilerplate to take full advantage of the tool, just add a `magerc.json` file to the root of your repository:
 
-Exemplo de `magerc.json`:
+Example of `magerc.json`:
 ```json
 {
   "scripts": [
@@ -82,17 +99,17 @@ Exemplo de `magerc.json`:
   ]
 }
 ```
-- **`scripts`**: Mapeia os comandos daquele boilerplate (Make, npm, composer) para opções bonitas e navegáveis no menu.
-- **`replacements`**: Ensina o Mage a encontrar uma string literal específica (como o nome original do boilerplate, `"backend-node"`) em um arquivo e substituir pelo nome escolhido pelo usuário na hora da geração.
+- **`scripts`**: Maps the commands of that boilerplate (Make, npm, composer) to beautiful and navigable options in the menu.
+- **`replacements`**: Teaches Mage to find a specific literal string (such as the original name of the boilerplate, `"backend-node"`) in a file and replace it with the name chosen by the user at the time of generation.
 
-### Estrutura do menu.json
+### menu.json Structure
 
-Para organizar seus boilerplates, você deve criar um arquivo `menu.json`. Ele suporta categorias aninhadas para facilitar a navegação.
+To organize your boilerplates, you must create a `menu.json` file. It supports nested categories for easy navigation.
 
-Exemplo de `menu.json`:
+Example of `menu.json`:
 ```json
 {
-  "name": "Meus Boilerplates",
+  "name": "My Boilerplates",
   "items": [
     {
       "name": "Frontend",
@@ -101,7 +118,7 @@ Exemplo de `menu.json`:
         {
           "name": "React + Vite",
           "type": "boilerplate",
-          "url": "https://github.com/usuario/react-boilerplate"
+          "url": "https://github.com/user/react-boilerplate"
         }
       ]
     },
@@ -112,7 +129,7 @@ Exemplo de `menu.json`:
         {
           "name": "Node.js + Clean Architecture",
           "type": "boilerplate",
-          "url": "https://github.com/usuario/node-boilerplate"
+          "url": "https://github.com/user/node-boilerplate"
         }
       ]
     }
